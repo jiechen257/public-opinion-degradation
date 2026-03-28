@@ -1,4 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { vi } from "vitest";
+import {
+  createExperimentRecord,
+  defaultFeaturedTopicId,
+  defaultPersonaIds,
+} from "./experiment-engine";
 
 describe("结果页主结构", () => {
   it("先给结论，再展开证据时间线", async () => {
@@ -39,5 +45,45 @@ describe("结果页主结构", () => {
 
     expect(screen.getAllByText("世界 A / 迟缓世界").length).toBeGreaterThan(0);
     expect(screen.getAllByText("世界 B / 热度世界").length).toBeGreaterThan(0);
+  });
+
+  it("点击拐点和救援后会在原位展开解释", async () => {
+    vi.useFakeTimers();
+
+    const reportModule = await import("./experiment-report").catch(() => null);
+
+    expect(reportModule).not.toBeNull();
+
+    if (!reportModule) {
+      return;
+    }
+
+    const { ExperimentReport } = reportModule;
+    const experiment = createExperimentRecord({
+      featuredTopicId: defaultFeaturedTopicId,
+      topic: "该不该为了不被骂而先把所有立场话说满，再讨论具体问题？",
+      rewardMode: "on",
+      personaIds: defaultPersonaIds,
+    });
+
+    render(<ExperimentReport experiment={experiment} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "查看关键拐点证据" }));
+
+    expect(screen.getByText(experiment.turningPoint.whyItMatters)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "推演反事实救援" }));
+
+    expect(
+      screen.getByText("正在模拟如果当时改掉这个条件"),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    expect(screen.getByText(experiment.rescue.verdict)).toBeInTheDocument();
+
+    vi.useRealTimers();
   });
 });

@@ -10,8 +10,11 @@
   --signal: #d4a95e;
   --cold: #7a94aa;
   --line: rgba(24, 21, 18, 0.18);
-  --font-body: "Noto Sans SC", sans-serif;
-  --font-display: "Noto Serif SC", serif;
+  --font-body:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
+    sans-serif;
+  --font-display:
+    "Source Han Serif SC", "Songti SC", "STSong", "Noto Serif SC", serif;
 }
 
 * {
@@ -46,9 +49,25 @@ a {
   text-decoration: none;
 }
 
+:focus-visible {
+  outline: 2px solid var(--rail);
+  outline-offset: 2px;
+}
+
 button,
 input,
 textarea,
 select {
   font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

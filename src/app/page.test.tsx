@@ -13,7 +13,7 @@ describe("首页首屏", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole("link", { name: "开始观察双世界实验" }),
+      screen.getByRole("button", { name: "开始观察双世界实验" }),
     ).toBeInTheDocument();
 
     const heroStage = screen.getByTestId("hero-stage");
