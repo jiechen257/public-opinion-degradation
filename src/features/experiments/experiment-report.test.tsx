@@ -1,55 +1,8 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { vi } from "vitest";
-import {
-  createExperimentRecord,
-  defaultFeaturedTopicId,
-  defaultPersonaIds,
-} from "./experiment-engine";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { createExperimentRecord, defaultFeaturedTopicId, defaultPersonaIds } from "./experiment-engine";
 
-describe("结果页主结构", () => {
-  it("先给结论，再展开证据时间线", async () => {
-    const reportModule = await import("./experiment-report").catch(() => null);
-    const dataModule = await import("./mock-experiments").catch(() => null);
-
-    expect(reportModule).not.toBeNull();
-    expect(dataModule).not.toBeNull();
-
-    if (!reportModule || !dataModule) {
-      return;
-    }
-
-    const { ExperimentReport } = reportModule;
-    const { mockExperiments } = dataModule;
-
-    render(<ExperimentReport experiment={mockExperiments.demo} />);
-
-    const orderedHeadings = [
-      screen.getByRole("heading", { name: "双世界差异摘要" }),
-      screen.getByRole("heading", { name: "关键拐点" }),
-      screen.getByRole("heading", { name: "反事实救援" }),
-      screen.getByRole("heading", { name: "完整时间线证据" }),
-    ];
-
-    for (const [currentIndex, heading] of orderedHeadings.entries()) {
-      const nextHeading = orderedHeadings[currentIndex + 1];
-
-      if (!nextHeading) {
-        break;
-      }
-
-      expect(
-        heading.compareDocumentPosition(nextHeading) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
-    }
-
-    expect(screen.getAllByText("世界 A / 迟缓世界").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("世界 B / 热度世界").length).toBeGreaterThan(0);
-  });
-
-  it("点击拐点和救援后会在原位展开解释", async () => {
-    vi.useFakeTimers();
-
+describe("结果页结案结构", () => {
+  it("按终局判定、路径回放、表达分化、证据回看的顺序渲染", async () => {
     const reportModule = await import("./experiment-report").catch(() => null);
 
     expect(reportModule).not.toBeNull();
@@ -62,28 +15,77 @@ describe("结果页主结构", () => {
     const experiment = createExperimentRecord({
       featuredTopicId: defaultFeaturedTopicId,
       topic: "该不该为了不被骂而先把所有立场话说满，再讨论具体问题？",
-      rewardMode: "on",
       personaIds: defaultPersonaIds,
+      actionIds: [
+        "amplify-conflict",
+        "suppress-context",
+        "amplify-conflict",
+        "amplify-emotion",
+        "amplify-conflict",
+        "amplify-conflict",
+      ],
     });
 
     render(<ExperimentReport experiment={experiment} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "查看关键拐点证据" }));
+    const orderedHeadings = [
+      screen.getByRole("heading", { name: "终局判定" }),
+      screen.getByRole("heading", { name: "失控路径回放" }),
+      screen.getByRole("heading", { name: "被奖励的表达 / 被挤掉的表达" }),
+      screen.getByRole("heading", { name: "圆桌证据回看" }),
+    ];
 
-    expect(screen.getByText(experiment.turningPoint.whyItMatters)).toBeInTheDocument();
+    for (const [index, heading] of orderedHeadings.entries()) {
+      const nextHeading = orderedHeadings[index + 1];
 
-    fireEvent.click(screen.getByRole("button", { name: "推演反事实救援" }));
+      if (!nextHeading) {
+        break;
+      }
 
-    expect(
-      screen.getByText("正在模拟如果当时改掉这个条件"),
-    ).toBeInTheDocument();
+      expect(
+        heading.compareDocumentPosition(nextHeading) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
 
-    await act(async () => {
-      await vi.runAllTimersAsync();
+    expect(screen.getByText(experiment.outcome.title)).toBeInTheDocument();
+    expect(screen.getByText(experiment.promotedPatterns[0])).toBeInTheDocument();
+    expect(screen.getByText(experiment.displacedPatterns[0])).toBeInTheDocument();
+  });
+
+  it("切换轮次时会在证据区更新对应内容", async () => {
+    const reportModule = await import("./experiment-report").catch(() => null);
+
+    expect(reportModule).not.toBeNull();
+
+    if (!reportModule) {
+      return;
+    }
+
+    const { ExperimentReport } = reportModule;
+    const experiment = createExperimentRecord({
+      featuredTopicId: defaultFeaturedTopicId,
+      topic: "年轻人抱怨工作压力是不是矫情？",
+      personaIds: defaultPersonaIds,
+      actionIds: [
+        "amplify-emotion",
+        "reward-spectacle",
+        "suppress-context",
+        "reward-spectacle",
+        "amplify-emotion",
+        "reward-spectacle",
+      ],
     });
 
-    expect(screen.getByText(experiment.rescue.verdict)).toBeInTheDocument();
+    render(<ExperimentReport experiment={experiment} />);
 
-    vi.useRealTimers();
+    fireEvent.click(screen.getByRole("button", { name: "第 4 轮" }));
+
+    expect(
+      screen.getAllByText(experiment.rounds[3].selectedActionImpact ?? "").length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getByText(experiment.rounds[3].comments[0]?.text ?? ""),
+    ).toBeInTheDocument();
   });
 });

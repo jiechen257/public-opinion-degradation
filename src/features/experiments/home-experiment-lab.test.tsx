@@ -1,61 +1,46 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
-import {
-  createExperimentRecord,
-  defaultFeaturedTopicId,
-  defaultPersonaIds,
-} from "./experiment-engine";
 import { HomeExperimentLab } from "./home-experiment-lab";
 
-describe("首页实验控制", () => {
-  it("阻止空问题提交", async () => {
-    const onOpenExperiment = vi.fn();
+describe("首页圆桌操盘", () => {
+  it("开始后进入圆桌现场，并在选择平台动作后推进到下一轮", () => {
+    render(<HomeExperimentLab onOpenExperiment={vi.fn()} />);
 
-    render(
-      <HomeExperimentLab
-        createExperiment={vi.fn()}
-        onOpenExperiment={onOpenExperiment}
-      />,
-    );
+    fireEvent.click(screen.getByRole("button", { name: "开始操盘这张圆桌" }));
 
-    fireEvent.change(screen.getByLabelText("样本问题"), {
-      target: { value: "   " },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "开始观察双世界实验" }));
+    expect(screen.getByText("第 1 轮")).toBeInTheDocument();
+    expect(screen.getAllByText("正常讨论").length).toBeGreaterThan(0);
+    expect(screen.getByTestId("roundtable-stage")).toBeInTheDocument();
 
-    expect(await screen.findByText("问题不能为空。")).toBeInTheDocument();
-    expect(onOpenExperiment).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "放大对立" }));
+
+    expect(screen.getByText("第 2 轮")).toBeInTheDocument();
+    expect(
+      screen.getByText("平台本轮奖励了更快完成敌我归类的发言。"),
+    ).toBeInTheDocument();
   });
 
-  it("创建实验时展示叙事式等待，再进入结果页", async () => {
-    vi.useFakeTimers();
-
-    const record = createExperimentRecord({
-      featuredTopicId: defaultFeaturedTopicId,
-      topic: "该不该为了不被骂而先把所有立场话说满，再讨论具体问题？",
-      rewardMode: "on",
-      personaIds: defaultPersonaIds,
-    });
+  it("完成 6 轮后进入结果页", () => {
     const onOpenExperiment = vi.fn();
 
-    render(
-      <HomeExperimentLab
-        createExperiment={vi.fn().mockResolvedValue(record)}
-        onOpenExperiment={onOpenExperiment}
-      />,
-    );
+    render(<HomeExperimentLab onOpenExperiment={onOpenExperiment} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "开始观察双世界实验" }));
+    fireEvent.click(screen.getByRole("button", { name: "开始操盘这张圆桌" }));
 
-    expect(screen.getByText("正在生成两个世界")).toBeInTheDocument();
-    expect(screen.getByText("正在寻找第一句带偏的话")).toBeInTheDocument();
-    expect(screen.getByText("正在推演救援分支")).toBeInTheDocument();
+    const actions = [
+      "放大对立",
+      "压低细节",
+      "放大对立",
+      "推高情绪",
+      "放大对立",
+      "放大对立",
+    ];
 
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
+    for (const label of actions) {
+      fireEvent.click(screen.getByRole("button", { name: label }));
+    }
 
-    expect(onOpenExperiment).toHaveBeenCalledWith(record.id);
-    vi.useRealTimers();
+    expect(onOpenExperiment).toHaveBeenCalledTimes(1);
+    expect(onOpenExperiment.mock.calls[0]?.[0]).toMatch(/^stance-preamble-/);
   });
 });

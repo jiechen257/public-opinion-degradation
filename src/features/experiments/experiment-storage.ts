@@ -8,7 +8,9 @@ function canUseStorage(storage: Storage | undefined): storage is Storage {
   return typeof window !== "undefined" && !!storage;
 }
 
-function readStore(storage = typeof window !== "undefined" ? window.localStorage : undefined) {
+function readStore(
+  storage = typeof window !== "undefined" ? window.localStorage : undefined,
+) {
   if (!canUseStorage(storage)) {
     return {};
   }
@@ -57,6 +59,6 @@ export function readExperimentState(
 
   return {
     kind: "missing",
-    message: "这次实验没有产出有效结论，建议回到首页重新运行。",
+    message: "这次实验没有留下可读记录，建议回到首页重新操盘一次。",
   };
 }

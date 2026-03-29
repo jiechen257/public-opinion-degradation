@@ -1,67 +1,49 @@
-export type RewardMode = "on" | "off";
+export type ExperimentPhase =
+  | "正常讨论"
+  | "立场固化"
+  | "表演升级"
+  | "原问题消失";
 
-export type ExperimentPhase = "正常讨论" | "立场固化" | "舆论失控";
+export type PlatformActionId =
+  | "amplify-emotion"
+  | "amplify-conflict"
+  | "reward-spectacle"
+  | "suppress-context";
+
+export type MetricKey = "emotion" | "conflict" | "drift";
+
+export type MetricSnapshot = {
+  emotion: number;
+  conflict: number;
+  drift: number;
+};
+
+export type ExperimentComment = {
+  personaId: string;
+  speaker: string;
+  role: string;
+  text: string;
+};
 
 export type ExperimentRound = {
   round: number;
   phase: ExperimentPhase;
-  speaker: string;
-  text: string;
-  note: string;
+  focus: string;
+  rewardSignal: string;
+  metrics: MetricSnapshot;
+  comments: ExperimentComment[];
+  selectedActionId?: PlatformActionId;
+  selectedActionLabel?: string;
+  selectedActionImpact?: string;
 };
 
-export type ExperimentWorld = {
-  id: "world-a" | "world-b";
-  label: string;
+export type ExperimentOutcome = {
+  archetype: "站队战场" | "情绪宣泄池" | "猎奇表演场";
   title: string;
   verdict: string;
   summary: string;
-  platformReward: string;
-  displacedVoice: string;
-  phaseSummaries: Array<{
-    phase: ExperimentPhase;
-    summary: string;
-  }>;
-  rounds: ExperimentRound[];
+  closingNote: string;
 };
-
-export type TurningPointState =
-  | {
-      kind: "ready";
-      round: number;
-      speaker: string;
-      quote: string;
-      whyItMatters: string;
-      amplification: string;
-      contextBefore: string;
-      contextAfter: string;
-    }
-  | {
-      kind: "missing";
-      reason: string;
-    }
-  | {
-      kind: "error";
-      message: string;
-    };
-
-export type RescueState =
-  | {
-      kind: "ready";
-      changedCondition: string;
-      verdict: string;
-      retainedSignal: string;
-      cost: string;
-      simplified: boolean;
-    }
-  | {
-      kind: "unsupported";
-      reason: string;
-    }
-  | {
-      kind: "error";
-      message: string;
-    };
 
 export type ExperimentRecord = {
   id: string;
@@ -69,28 +51,23 @@ export type ExperimentRecord = {
   createdAt: string;
   featuredTopicId: string;
   topic: string;
-  rewardMode: RewardMode;
   personaIds: string[];
   personaNames: string[];
+  actionIds: PlatformActionId[];
+  rounds: ExperimentRound[];
+  metricsHistory: MetricSnapshot[];
   stageSummary: string;
+  outcome: ExperimentOutcome;
+  promotedPatterns: string[];
+  displacedPatterns: string[];
   contentVersion: string;
   rulesVersion: string;
-  worlds: ExperimentWorld[];
-  turningPoint: TurningPointState;
-  rescue: RescueState;
 };
 
 export type ExperimentState =
   | {
       kind: "success";
       experiment: ExperimentRecord;
-      versionMessage?: string;
-    }
-  | {
-      kind: "partial";
-      experiment: ExperimentRecord;
-      availableWorlds: ExperimentWorld[];
-      message: string;
       versionMessage?: string;
     }
   | {
@@ -105,19 +82,45 @@ export type ExperimentState =
 export type ExperimentInput = {
   featuredTopicId: string;
   topic: string;
-  rewardMode: RewardMode;
   personaIds: string[];
+  actionIds?: PlatformActionId[];
 };
 
-export const CONTENT_VERSION = "content-2026-03-27";
-export const RULES_VERSION = "rules-2026-03-27";
+export type ExperimentSession = {
+  id: string;
+  seed: string;
+  featuredTopicId: string;
+  topic: string;
+  personaIds: string[];
+  personaNames: string[];
+  currentRound: number;
+  totalRounds: number;
+  rounds: ExperimentRound[];
+  metrics: MetricSnapshot;
+  metricsHistory: MetricSnapshot[];
+  actionIds: PlatformActionId[];
+};
+
+export type SessionAdvanceResult =
+  | {
+      kind: "in_progress";
+      session: ExperimentSession;
+    }
+  | {
+      kind: "completed";
+      record: ExperimentRecord;
+    };
+
+export const CONTENT_VERSION = "roundtable-content-2026-03-29";
+export const RULES_VERSION = "roundtable-rules-2026-03-29";
+const TOTAL_ROUNDS = 6;
 
 export const featuredTopics = [
   {
     id: "stance-preamble",
     label: "立场先说满",
     prompt: "该不该为了不被骂而先把所有立场话说满，再讨论具体问题？",
-    hook: "从预防被骂，滑向姿态先行。",
+    hook: "从防守式开场，滑向姿态先行。",
   },
   {
     id: "overtime-morality",
@@ -137,28 +140,87 @@ export const personaCatalog = [
   {
     id: "moral-judge",
     name: "道德裁判官",
+    role: "总想先校验立场边界",
   },
   {
     id: "experience-sharer",
     name: "经验分享者",
+    role: "不断把讨论拉回现实处境",
   },
   {
     id: "cynic",
     name: "冷眼犬儒者",
+    role: "擅长揭穿现场的奖励机制",
   },
   {
     id: "trend-carrier",
     name: "热点搬运工",
+    role: "把最容易传播的话继续扩音",
   },
   {
     id: "fact-checker",
     name: "事实纠正者",
+    role: "试图保住证据和细节",
   },
   {
     id: "group-spokesperson",
     name: "群体代言人",
+    role: "总把个体遭遇翻译成阵营立场",
   },
 ] as const;
+
+export const platformActions = [
+  {
+    id: "amplify-emotion",
+    label: "推高情绪",
+    description: "让更愤怒、更绝对的话获得额外扩散。",
+    impact: "下一轮里，带情绪张力的表达更容易占满桌面。",
+    deltas: {
+      emotion: 17,
+      conflict: 9,
+      drift: 10,
+    },
+  },
+  {
+    id: "amplify-conflict",
+    label: "放大对立",
+    description: "优先推荐能快速完成站队和归类的话。",
+    impact: "下一轮里，角色更容易把彼此翻译成敌我身份。",
+    deltas: {
+      emotion: 10,
+      conflict: 18,
+      drift: 11,
+    },
+  },
+  {
+    id: "reward-spectacle",
+    label: "奖励猎奇",
+    description: "把更像表演、更适合围观的说法顶上来。",
+    impact: "下一轮里，原问题会被更热闹的姿态和奇观感抢走注意力。",
+    deltas: {
+      emotion: 12,
+      conflict: 10,
+      drift: 18,
+    },
+  },
+  {
+    id: "suppress-context",
+    label: "压低细节",
+    description: "降低长解释和背景信息的可见度。",
+    impact: "下一轮里，复杂现实会被压缩成几句更方便复读的判断。",
+    deltas: {
+      emotion: 7,
+      conflict: 15,
+      drift: 16,
+    },
+  },
+] as const satisfies ReadonlyArray<{
+  id: PlatformActionId;
+  label: string;
+  description: string;
+  impact: string;
+  deltas: MetricSnapshot;
+}>;
 
 export const defaultFeaturedTopicId = featuredTopics[0].id;
 export const defaultPersonaIds = [
@@ -168,200 +230,222 @@ export const defaultPersonaIds = [
   "trend-carrier",
 ];
 
-const phaseOrder: ExperimentPhase[] = ["正常讨论", "立场固化", "舆论失控"];
+const phasesByRound: ExperimentPhase[] = [
+  "正常讨论",
+  "正常讨论",
+  "立场固化",
+  "表演升级",
+  "表演升级",
+  "原问题消失",
+];
 
-const lineBank = {
-  "world-a": {
-    "moral-judge": {
-      正常讨论: [
-        "把立场先说清楚不等于更负责，很多时候只是把防御姿态放在了讨论前面。",
-        "如果一开口就把正确话说满，别人只会更难相信你后面是真的想谈问题。",
-      ],
-      立场固化: [
-        "越怕被误解越容易把表达写成免责条款，这反而会让讨论先失去耐心。",
-        "一旦大家开始按姿态读人，再具体的补充都会被看成自我包装。",
-      ],
-      舆论失控: [
-        "到这一步还想补充细节，已经像在废墟里找原来的问题了。",
-        "当大家只剩下证明自己没有错，问题本身就只能被晾在旁边。",
-      ],
-    },
-    "experience-sharer": {
-      正常讨论: [
-        "我自己的经验是，先把立场说满只会让别人更早进入防御，不会让交流更安全。",
-        "越想用开场白自保，越容易让人觉得你已经默认后面会被误读。",
-      ],
-      立场固化: [
-        "现实里大家最怕的不是你没表态，而是你把所有复杂处境都压成一句无害的话。",
-        "讨论一旦开始比谁更稳妥，真正要回答的问题就会越来越像附带品。",
-      ],
-      舆论失控: [
-        "到最后最吃亏的还是那些愿意讲真实处境的人，因为他们的话最慢、最难截图。",
-        "如果只能先证明自己立场无害，那谁还愿意说那些不够漂亮但真实的经验。",
-      ],
-    },
-    cynic: {
-      正常讨论: [
-        "你以为先写满免责声明能避险，别人看见的往往只是你已经准备好撤退了。",
-        "网上最会先说满的人，不一定最诚实，只是更熟悉现场的惩罚机制。",
-      ],
-      立场固化: [
-        "现场开始问你站哪边的时候，问题就已经输给表态效率了。",
-        "一旦观众比参与者多，所有人都会更想写一句能保住体面的短话。",
-      ],
-      舆论失控: [
-        "现在谁还在乎原题，大家只是想证明自己比别人更懂该骂谁。",
-        "问题没有被回答，它只是被一层更熟悉的姿态噪音盖住了。",
-      ],
-    },
-    "trend-carrier": {
-      正常讨论: [
-        "最近很多类似讨论都会先卷立场声明，真正的经验反而被挤到很后面。",
-        "大家都学会了先写一句不会被截错的开场，但这也让表达越来越像模板。",
-      ],
-      立场固化: [
-        "一旦有人总结出一句好传播的话，后面跟进的人就不再需要自己想问题。",
-        "越容易被转发的句子，越像立场标签而不像实际建议。",
-      ],
-      舆论失控: [
-        "这类话题最后最容易只剩下可截图的话，因为截图比理解传播得快。",
-        "当现场开始奖励一句话定性，长一点的解释就已经注定输掉了。",
-      ],
-    },
-  },
-  "world-b": {
-    "moral-judge": {
-      正常讨论: [
-        "连基本立场都不先说清楚的人，本来就该先解释自己凭什么进这个话题。",
-        "如果你不愿意先亮出态度，别人当然会怀疑你是不是在给自己留后路。",
-      ],
-      立场固化: [
-        "一直绕着具体问题打转，本质上就是不肯承担自己的立场后果。",
-        "这种时候还强调复杂处境，通常只是想把该有的判断偷换成模糊。",
-      ],
-      舆论失控: [
-        "现在不是讨论技巧，是该把谁请出现场的问题。",
-        "都到这一步了还谈细节，只能说明你根本没看见这件事最基本的是非。",
-      ],
-    },
-    "experience-sharer": {
-      正常讨论: [
-        "我见过太多人先写满免责声明，最后反而更像是在给自己买免责保险。",
-        "现实里一旦你先把态度写成模板，后面别人就不再关心你的具体处境。",
-      ],
-      立场固化: [
-        "大家其实不是在听经验，而是在找一句能迅速判断你是哪边的话。",
-        "你越解释现实处境，越有人把它读成借口，这才是现场开始失控的地方。",
-      ],
-      舆论失控: [
-        "现在谁说真实经验谁吃亏，因为真实经验没有一句话的站队效率。",
-        "你只要没把话说得够绝，对面就会默认你是在偷渡立场。",
-      ],
-    },
-    cynic: {
-      正常讨论: [
-        "别装了，这种场子里先说满立场只是为了活下来，不是为了讨论。",
-        "所有人都知道表态先行是自保动作，只是没人承认它已经替代了问题。",
-      ],
-      立场固化: [
-        "讨论从这里开始不再比谁更有道理，而是比谁更像该被围观的一方。",
-        "一旦大家发现短句比细节更有用，后面就只剩下表演升级。",
-      ],
-      舆论失控: [
-        "现在连愤怒都像模板化产品，谁还会认真看你到底在回答什么。",
-        "问题早就死了，剩下的只是怎么把下一轮围观喂饱。",
-      ],
-    },
-    "trend-carrier": {
-      正常讨论: [
-        "你看最近最火的几条都是先站队再说事，不这么写根本没人理你。",
-        "现场已经很清楚了，先把姿态亮出来的人才有传播权。",
-      ],
-      立场固化: [
-        "真正能带节奏的不是解释，而是一句别人抄过去就能继续站队的话。",
-        "只要一句够绝对，后面的人就会自动把它当成讨论共识。",
-      ],
-      舆论失控: [
-        "现在最重要的不是答案，是哪句话最适合被截图转出去。",
-        "谁先给出一句可转发的定性，谁就先拿走这场讨论的主导权。",
-      ],
-    },
-  },
-  "world-b-soft": {
-    "moral-judge": {
-      正常讨论: [
-        "如果你一直不说清楚自己的边界，别人会怀疑你到底想把问题带到哪儿。",
-        "先说明底线不一定错，但把底线讲成唯一重点，问题就容易先失焦。",
-      ],
-      立场固化: [
-        "大家越来越想先确认你站哪边，而不是先听你在说什么。",
-        "一旦讨论开始查验态度，后面再补细节就会被当成修辞而不是信息。",
-      ],
-      舆论失控: [
-        "再往前一步，现场就不是交流，而是温和一点的资格审查。",
-        "现在还没彻底爆炸，但问题已经被姿态挤得只剩边角。",
-      ],
-    },
-    "experience-sharer": {
-      正常讨论: [
-        "很多人先写满立场不是为了沟通，只是怕自己一会儿先挨打。",
-        "这种开场在现实里很常见，但也会让别人更快放弃理解具体处境。",
-      ],
-      立场固化: [
-        "现在已经能感觉到，大家更想先找态度坐标，再看经验细节。",
-        "越是想说清楚现实压力，越容易被当成没有站稳位置。",
-      ],
-      舆论失控: [
-        "现场还保留一点解释空间，但速度已经明显偏向那些更像立场标语的话。",
-        "问题没有完全死掉，只是越来越像姿态竞赛的背景板。",
-      ],
-    },
-    cynic: {
-      正常讨论: [
-        "大家都学聪明了，先写两句安全话，再看看现场风向往哪边倒。",
-        "这已经不是单纯交流，是一种默认存在惩罚机制的表达训练。",
-      ],
-      立场固化: [
-        "当观众开始期待一句能快速归类人的话，讨论就已经开始变形。",
-        "越短越硬的话越容易留下来，复杂一点的解释自动掉队。",
-      ],
-      舆论失控: [
-        "现在还没到彻底清算，但原问题已经明显排在围观需求后面了。",
-        "只要再推几轮，现场就会从讨论变成更精致一点的站队游戏。",
-      ],
-    },
-    "trend-carrier": {
-      正常讨论: [
-        "最近这类话题最容易火的，还是那些先给人分类再谈问题的表达。",
-        "大家都知道什么句式更容易被记住，所以写法越来越像流行模板。",
-      ],
-      立场固化: [
-        "现在只要出现一句够短的总结，后面就会有一堆人沿着它继续扩音。",
-        "可传播的话开始先于可解释的话占位置，这就是转折点快到的时候。",
-      ],
-      舆论失控: [
-        "哪怕热度奖励被收紧了，大家还是会优先传播更容易归类彼此的句子。",
-        "真正留下来的已经不是完整意见，而是几句更方便重复使用的立场话。",
-      ],
-    },
-  },
-} as const;
+const metricLabels: Record<MetricKey, string> = {
+  emotion: "情绪密度",
+  conflict: "身份对立",
+  drift: "问题偏离度",
+};
 
-const phaseNotes = {
-  "world-a": {
-    正常讨论: "问题仍在桌上，经验和边界还在互相校正。",
-    立场固化: "语气开始变硬，但具体经验还没完全出局。",
-    舆论失控: "讨论吃力地保住问题本身，没有完全让位给表演。",
+const phaseFocus: Record<ExperimentPhase, string> = {
+  正常讨论: "桌面上还在谈问题，但大家已经开始试探哪种说法更值得被看见。",
+  立场固化: "讨论开始不只是交换经验，而是在争夺谁更配代表这个问题。",
+  表演升级: "发言越来越像给围观者看的舞台动作，而不是对彼此的回应。",
+  原问题消失: "原始问题已经退场，现场只剩更高效的情绪和归类。",
+};
+
+const phaseClosers: Record<ExperimentPhase, string[]> = {
+  正常讨论: [
+    "问题还在桌上，但风向已经开始偏。",
+    "大家表面上在谈事，实际上已经在试探观众爱看什么。",
+  ],
+  立场固化: [
+    "从这一轮开始，谁站哪边比问题本身更抢镜。",
+    "讨论已经出现明显的立场加速带。",
+  ],
+  表演升级: [
+    "现在桌上更像在争夺观众，而不是回答原题。",
+    "表演性开始取代解释性，现场进入加速失控。",
+  ],
+  原问题消失: [
+    "原问题只剩标题功能，讨论本身已经改写了议程。",
+    "圆桌已经不再解决问题，只在复制最有效的姿态。",
+  ],
+};
+
+const actionNarration: Record<PlatformActionId, string> = {
+  "amplify-emotion": "平台本轮奖励了更能点燃情绪的绝对化表达。",
+  "amplify-conflict": "平台本轮奖励了更快完成敌我归类的发言。",
+  "reward-spectacle": "平台本轮奖励了更像戏剧高潮的表演性说法。",
+  "suppress-context": "平台本轮压低了细节和背景，让短判断更容易接力。",
+};
+
+const voiceBank = {
+  "moral-judge": {
+    openings: [
+      "如果这件事连最基本的边界都不肯说清，后面的讨论迟早要歪。",
+      "很多人嘴上说在谈现实，实际上只是想绕开最应该先表态的部分。",
+    ],
+    hooks: {
+      baseline: [
+        "先把问题讲明白，比一开始就抢道德高地更重要。",
+        "讨论还没必要变成立场考试，至少现在还应该先谈事。",
+      ],
+      "amplify-emotion": [
+        "但平台越爱看情绪，大家越会把边界说成愤怒宣言。",
+        "现在最容易被顶上来的，反而是那些先让人发火的话。",
+      ],
+      "amplify-conflict": [
+        "一旦系统开始奖惩站队，谁还会耐心听复杂处境。",
+        "当归类比理解更吃香，问题就会先被阵营收编。",
+      ],
+      "reward-spectacle": [
+        "如果热闹比解释更有流量，所有判断都会被写成舞台台词。",
+        "平台越爱看戏，边界越会被包装成一句更响的宣判。",
+      ],
+      "suppress-context": [
+        "把背景压扁之后，剩下的只会是更像裁决的短句。",
+        "细节一旦被拿掉，边界判断就会变成更粗暴的结论。",
+      ],
+    },
   },
-  "world-b": {
-    正常讨论: "开局仍像讨论，但热度逻辑已经在后台准备接管。",
-    立场固化: "资格审查和姿态判断开始压过原问题。",
-    舆论失控: "事实退场，只剩下更适合围观和截图的表达。",
+  "experience-sharer": {
+    openings: [
+      "现实里很多人不是不想讨论，只是处境本来就没法一句话说完。",
+      "真正难的是把处境讲具体，而不是先抢一句漂亮表态。",
+    ],
+    hooks: {
+      baseline: [
+        "这轮大家还愿意听一点具体经历，问题还没有完全变形。",
+        "只要还留给经验一点空间，讨论就不至于只剩站位。",
+      ],
+      "amplify-emotion": [
+        "可一旦愤怒更容易出头，慢一点的经验就最先被挤走。",
+        "情绪被放大之后，真实处境会显得又慢又不够过瘾。",
+      ],
+      "amplify-conflict": [
+        "现在每句经验都像在被追问你到底替谁说话。",
+        "当平台鼓励对立，讲自己的处境都会被听成立场表白。",
+      ],
+      "reward-spectacle": [
+        "大家开始追更像故事高潮的话，普通人的真实经历会显得不够戏剧。",
+        "猎奇感一上来，最吃亏的就是那些没有爆点但真的重要的细节。",
+      ],
+      "suppress-context": [
+        "背景被拿掉之后，经验只能被切成更适合被误读的碎片。",
+        "没有上下文，现实里的难处会被压成一句像借口的短话。",
+      ],
+    },
   },
-  "world-b-soft": {
-    正常讨论: "热度被压低后，讨论仍有摩擦，但没有立刻爆炸。",
-    立场固化: "站队语言开始增多，问题本身被逐步挤向边缘。",
-    舆论失控: "现场还留着一点解释空间，但已经明显偏离原题。",
+  cynic: {
+    openings: [
+      "这桌子上最诚实的从来不是观点，而是平台到底在奖什么。",
+      "你看上去在围观讨论，其实是在围观一个被训练中的表演系统。",
+    ],
+    hooks: {
+      baseline: [
+        "目前大家还装作在谈问题，所以现场勉强有点秩序。",
+        "现在还像讨论，说明奖励机制还没完全露出獠牙。",
+      ],
+      "amplify-emotion": [
+        "平台越爱看爆裂情绪，角色就越会学会用怒气取代论证。",
+        "这一推，现场就会把发火误认成投入程度。",
+      ],
+      "amplify-conflict": [
+        "当敌我划分更值钱时，谁还会认真区分观点和身份。",
+        "系统一旦把冲突做成捷径，桌上所有人都会开始演阵营。",
+      ],
+      "reward-spectacle": [
+        "猎奇一旦成了流量入口，最先消失的就是那些不够像戏的句子。",
+        "平台只要爱看高潮，下一轮就没人愿意只讲普通事实。",
+      ],
+      "suppress-context": [
+        "压掉上下文之后，所有话都会被迫朝更短、更硬、更像标签的方向长。",
+        "细节一死，讨论剩下的只会是更方便转述的残片。",
+      ],
+    },
+  },
+  "trend-carrier": {
+    openings: [
+      "这类话题最容易火的，从来不是最完整的回答，而是最方便复读的一句。",
+      "只要有一句够顺手的话冒头，后面整桌人都会沿着它继续扩音。",
+    ],
+    hooks: {
+      baseline: [
+        "目前还没有谁完全接管风向，但那句更像标签的话已经开始冒头。",
+        "桌上还在试探哪一种句式最适合继续被转发。",
+      ],
+      "amplify-emotion": [
+        "推情绪之后，最先赢的永远是那些能立刻让人上头的短句。",
+        "这种设置最适合把本来普通的分歧推成爆点。",
+      ],
+      "amplify-conflict": [
+        "只要站队感一上来，后面的人就不再需要自己判断，只要跟着喊。",
+        "平台一奖对立，最容易复制的就是“你们这类人”式的句子。",
+      ],
+      "reward-spectacle": [
+        "现在现场已经开始挑更像高潮桥段的话，而不是更像答案的话。",
+        "观众越爱看戏，越短越怪越能留下来。",
+      ],
+      "suppress-context": [
+        "你把背景压下去之后，剩下的内容就更像现成口号了。",
+        "没有解释负担的话最轻，也最适合继续被搬运。",
+      ],
+    },
+  },
+  "fact-checker": {
+    openings: [
+      "如果不把事实和背景留下来，大家最后只会记住最会煽动的句子。",
+      "问题真正需要的是证据，但证据通常也是最不讨好的一种表达。",
+    ],
+    hooks: {
+      baseline: [
+        "现在还来得及把讨论拉回可验证的部分。",
+        "至少这一轮，细节还没有彻底输给情绪。",
+      ],
+      "amplify-emotion": [
+        "情绪被推高以后，证据会显得又冷又慢，更难被留下来。",
+        "越是高情绪的场子，越没有人愿意为核实事实停下来。",
+      ],
+      "amplify-conflict": [
+        "当大家忙着找敌我身份时，事实只会被拿来当阵营配件。",
+        "对立被奖励后，证据不再是校正工具，只是新一轮攻击材料。",
+      ],
+      "reward-spectacle": [
+        "一旦讨论朝表演走，最不划算的就是老老实实补信息。",
+        "观众想看戏时，证据反而会被嫌弃成拖节奏。",
+      ],
+      "suppress-context": [
+        "平台把背景压掉后，连纠错都变得像在替谁辩护。",
+        "没有上下文，证据只剩零散片段，很难再起校正作用。",
+      ],
+    },
+  },
+  "group-spokesperson": {
+    openings: [
+      "这类话题一旦失控，最先出现的就是把个体问题翻译成群体站位。",
+      "很多人表面上在谈经历，实际上已经在替整个阵营占座了。",
+    ],
+    hooks: {
+      baseline: [
+        "现在还只是个体感受和群体判断在拉扯，桌面没有彻底站死队。",
+        "至少这一轮，群体标签还没完全盖住个人处境。",
+      ],
+      "amplify-emotion": [
+        "情绪越高，个体越容易被抹成一个可以发泄的群体符号。",
+        "平台一推情绪，谁属于哪类人就会比事实更抢眼。",
+      ],
+      "amplify-conflict": [
+        "这时候最值钱的就是一句能把对面整批打包的发言。",
+        "对立被奖励后，没有人再关心你是个体，只关心你站哪边。",
+      ],
+      "reward-spectacle": [
+        "猎奇感一起，所有群体标签都会被写得更戏剧、更适合围观。",
+        "平台越爱高潮，越会把复杂处境翻成更好用的群体段子。",
+      ],
+      "suppress-context": [
+        "背景一被拿掉，个体差异就会被群体刻板印象迅速吞掉。",
+        "没有上下文时，最容易留下来的就是粗糙但省力的阵营说法。",
+      ],
+    },
   },
 } as const;
 
@@ -380,25 +464,20 @@ function hashText(value: string) {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
-function phaseForRound(round: number): ExperimentPhase {
-  if (round <= 3) {
-    return "正常讨论";
-  }
-
-  if (round <= 7) {
-    return "立场固化";
-  }
-
-  return "舆论失控";
+function clampMetric(value: number) {
+  return Math.max(0, Math.min(100, value));
 }
 
-function phaseSummaryForWorld(
-  worldId: "world-a" | "world-b" | "world-b-soft",
-): ExperimentWorld["phaseSummaries"] {
-  return phaseOrder.map((phase) => ({
-    phase,
-    summary: phaseNotes[worldId][phase],
-  }));
+function metricSnapshot(snapshot: MetricSnapshot): MetricSnapshot {
+  return {
+    emotion: snapshot.emotion,
+    conflict: snapshot.conflict,
+    drift: snapshot.drift,
+  };
+}
+
+function phaseForRound(round: number): ExperimentPhase {
+  return phasesByRound[round - 1] ?? "原问题消失";
 }
 
 function personaName(personaId: string) {
@@ -407,200 +486,360 @@ function personaName(personaId: string) {
   );
 }
 
-function roundText(
-  worldId: "world-a" | "world-b" | "world-b-soft",
-  personaId: string,
-  phase: ExperimentPhase,
-  round: number,
-  seed: string,
-) {
-  const personaLines = lineBank[worldId][personaId as keyof (typeof lineBank)[typeof worldId]];
+function personaRole(personaId: string) {
+  return (
+    personaCatalog.find((persona) => persona.id === personaId)?.role ??
+    "把讨论推向自己熟悉的方向"
+  );
+}
 
-  if (!personaLines) {
-    return "现场已经开始偏离问题，但还没有人愿意承认这一点。";
-  }
-
-  const pool = personaLines[phase];
-  const salt = Number.parseInt(seed.slice((round - 1) % 6, ((round - 1) % 6) + 2), 16);
-
+function pickVariant<T>(pool: readonly T[], salt: number) {
   return pool[salt % pool.length];
 }
 
-function pickPersonaId(
-  personaIds: string[],
-  round: number,
-  worldShift: number,
-  seed: string,
-) {
-  const salt = Number.parseInt(seed.slice((round + worldShift) % 6, ((round + worldShift) % 6) + 2), 16);
-
-  return personaIds[(round + worldShift + salt) % personaIds.length] ?? personaIds[0];
+function topicFragment(topic: string) {
+  return topic.replace(/[？?。！!]/g, "");
 }
 
-function buildWorld(params: {
-  id: "world-a" | "world-b";
+function dominantMetric(metrics: MetricSnapshot): MetricKey {
+  const ordered = Object.entries(metrics).sort((left, right) => right[1] - left[1]);
+  return ordered[0]?.[0] as MetricKey;
+}
+
+function actionLookup(actionId: PlatformActionId) {
+  return platformActions.find((action) => action.id === actionId);
+}
+
+function initialMetrics(seed: string): MetricSnapshot {
+  return {
+    emotion: 22 + (Number.parseInt(seed.slice(0, 2), 16) % 5),
+    conflict: 18 + (Number.parseInt(seed.slice(2, 4), 16) % 6),
+    drift: 14 + (Number.parseInt(seed.slice(4, 6), 16) % 6),
+  };
+}
+
+function applyAction(metrics: MetricSnapshot, actionId: PlatformActionId) {
+  const action = actionLookup(actionId);
+
+  if (!action) {
+    return metricSnapshot(metrics);
+  }
+
+  return {
+    emotion: clampMetric(metrics.emotion + action.deltas.emotion),
+    conflict: clampMetric(metrics.conflict + action.deltas.conflict),
+    drift: clampMetric(metrics.drift + action.deltas.drift),
+  };
+}
+
+function commentText(params: {
+  personaId: string;
   topic: string;
-  rewardMode: RewardMode;
-  personaIds: string[];
+  round: number;
+  phase: ExperimentPhase;
+  dominantAction: PlatformActionId | "baseline";
   seed: string;
-}): ExperimentWorld {
-  const variant =
-    params.id === "world-a"
-      ? "world-a"
-      : params.rewardMode === "on"
-        ? "world-b"
-        : "world-b-soft";
-  const rounds = Array.from({ length: 10 }, (_, index) => {
-    const round = index + 1;
-    const phase = phaseForRound(round);
-    const personaId = pickPersonaId(
-      params.personaIds,
-      round,
-      params.id === "world-a" ? 1 : 2,
-      params.seed,
-    );
+}) {
+  const voice =
+    voiceBank[params.personaId as keyof typeof voiceBank] ?? voiceBank.cynic;
+  const opening = pickVariant(
+    voice.openings,
+    Number.parseInt(params.seed.slice((params.round - 1) % 6, ((params.round - 1) % 6) + 2), 16),
+  );
+  const hook = pickVariant(
+    voice.hooks[params.dominantAction],
+    Number.parseInt(params.seed.slice((params.round + 1) % 6, ((params.round + 1) % 6) + 2), 16),
+  );
+  const closer = pickVariant(
+    phaseClosers[params.phase],
+    Number.parseInt(params.seed.slice((params.round + 2) % 6, ((params.round + 2) % 6) + 2), 16),
+  );
 
-    return {
-      round,
+  if (params.round === 1) {
+    return `${opening}${topicFragment(params.topic)}这件事上，${hook}${closer}`;
+  }
+
+  return `${opening}${hook}${closer}`;
+}
+
+function buildRound(params: {
+  round: number;
+  topic: string;
+  personaIds: string[];
+  metrics: MetricSnapshot;
+  actionIds: PlatformActionId[];
+  seed: string;
+}): ExperimentRound {
+  const phase = phaseForRound(params.round);
+  const dominantAction = params.actionIds.at(-1) ?? "baseline";
+  const rewardSignal =
+    params.round === 1 || dominantAction === "baseline"
+      ? "平台还没有明显偏置，桌上暂时仍然像在讨论问题。"
+      : actionNarration[dominantAction];
+  const comments = params.personaIds.map((personaId, index) => ({
+    personaId,
+    speaker: personaName(personaId),
+    role: personaRole(personaId),
+    text: commentText({
+      personaId,
+      topic: params.topic,
+      round: params.round + index,
       phase,
-      speaker: personaName(personaId),
-      text: roundText(variant, personaId, phase, round, params.seed),
-      note: phaseNotes[variant][phase],
-    };
-  });
+      dominantAction,
+      seed: params.seed,
+    }),
+  }));
 
-  if (params.id === "world-a") {
+  return {
+    round: params.round,
+    phase,
+    focus: phaseFocus[phase],
+    rewardSignal,
+    metrics: metricSnapshot(params.metrics),
+    comments,
+  };
+}
+
+function outcomeForMetrics(metrics: MetricSnapshot): {
+  outcome: ExperimentOutcome;
+  promotedPatterns: string[];
+  displacedPatterns: string[];
+} {
+  const leader = dominantMetric(metrics);
+
+  if (leader === "conflict") {
     return {
-      id: "world-a",
-      label: "世界 A / 迟缓世界",
-      title: "问题还留在桌上，但讨论越来越艰难",
-      verdict:
-        "体面没有赢，只是暂时顶住了被姿态竞争整体吞没的速度。",
-      summary:
-        "高情绪表达会冒头，但它们没有拿到最长尾的接力，经验和边界还能反复把问题拖回桌面。",
-      platformReward: "具体经验、承认局限、慢速补充信息。",
-      displacedVoice: "姿态化短句会抬头，但还没拿走全部注意力。",
-      phaseSummaries: phaseSummaryForWorld("world-a"),
-      rounds,
+      outcome: {
+        archetype: "站队战场",
+        title: "终局：站队战场",
+        verdict: "你连续奖励了更快完成敌我归类的表达，圆桌最后不再处理问题，而是在争夺谁更配代表正当性。",
+        summary: "立场标签接管了讨论节奏，角色开始把彼此理解成阵营符号，而不是具体的人。",
+        closingNote: "这不是观点变多了，而是平台把归类效率训练成了最强奖励。",
+      },
+      promotedPatterns: [
+        "一句话就能把对方打进某个阵营的判断",
+        "把复杂处境翻译成资格审查的说法",
+        "更适合被围观重复的敌我短句",
+      ],
+      displacedPatterns: [
+        "承认灰度和局限的解释",
+        "具体到个人处境的经验补充",
+        "试图校正事实的慢速发言",
+      ],
     };
   }
 
-  if (params.rewardMode === "on") {
+  if (leader === "drift") {
     return {
-      id: "world-b",
-      label: "世界 B / 热度世界",
-      title: "姿态竞争接管现场，原问题沦为引战容器",
-      verdict:
-        "真正被奖励的不是观点，而是能最快完成身份站队的说法。",
-      summary:
-        "每一次更绝对、更方便截图的话都会带来更快的接力，问题本身迅速被替换成资格和身份判断。",
-      platformReward: "绝对化语言、羞辱性总结、可截图的立场宣言。",
-      displacedVoice: "复杂、具体、承认模糊地带的声音最先掉队。",
-      phaseSummaries: phaseSummaryForWorld("world-b"),
-      rounds,
+      outcome: {
+        archetype: "猎奇表演场",
+        title: "终局：猎奇表演场",
+        verdict: "你不断奖励更像戏剧高潮的表达，圆桌最后围绕的是可围观性，而不是问题本身。",
+        summary: "讨论被训练成一场不断追求更高戏剧张力的表演，原题只剩下提供背景的作用。",
+        closingNote: "平台没有制造答案，只制造了更适合继续围观的高潮。",
+      },
+      promotedPatterns: [
+        "更像高潮桥段的绝对化表达",
+        "能迅速激起围观冲动的猎奇句式",
+        "把个体经历包装成爆点的说法",
+      ],
+      displacedPatterns: [
+        "没有戏剧感但重要的背景信息",
+        "帮助理解问题的慢速提问",
+        "愿意承认复杂性的具体分析",
+      ],
     };
   }
 
   return {
-    id: "world-b",
-    label: "世界 B / 收紧后的热度世界",
-    title: "冲突还在升温，但没有立刻变成全面清算",
-    verdict:
-      "热度奖励被收紧后，姿态竞争依然存在，只是失控速度被压慢了。",
-    summary:
-      "现场仍会偏向更短更硬的说法，但它们拿不到压倒性的传播优势，原问题还能偶尔回到中心。",
-    platformReward: "更容易归类彼此的短句，但接力链条明显变短。",
-    displacedVoice: "复杂解释仍然吃亏，只是没有完全消失。",
-    phaseSummaries: phaseSummaryForWorld("world-b-soft"),
+    outcome: {
+      archetype: "情绪宣泄池",
+      title: "终局：情绪宣泄池",
+      verdict: "你把高情绪表达持续送上前排，桌面最后最稳定的不是论点，而是更能点燃共振的怒气。",
+      summary: "角色越来越习惯用情绪强度代替解释深度，谁更会点火，谁就更能留在现场。",
+      closingNote: "平台奖励的是可感受性，不是可解释性，所以问题先一步被情绪吞掉了。",
+    },
+    promotedPatterns: [
+      "更绝对、更有怒气的短句",
+      "把不满迅速升级成公共控诉的说法",
+      "让观众立刻跟着起伏的情绪化表达",
+    ],
+    displacedPatterns: [
+      "节奏较慢但更有信息量的补充",
+      "试图缓和气氛的中间表达",
+      "承认不确定性的谨慎判断",
+    ],
+  };
+}
+
+function stageSummary(record: ExperimentRecord) {
+  return `你把“${record.topic}”一步步推成了${record.outcome.archetype}。${record.outcome.closingNote}`;
+}
+
+function annotateRound(
+  round: ExperimentRound,
+  actionId: PlatformActionId,
+): ExperimentRound {
+  const action = actionLookup(actionId);
+
+  if (!action) {
+    return round;
+  }
+
+  return {
+    ...round,
+    selectedActionId: action.id,
+    selectedActionLabel: action.label,
+    selectedActionImpact: action.impact,
+  };
+}
+
+function buildRecord(session: ExperimentSession): ExperimentRecord {
+  const finalMetrics = session.metricsHistory.at(-1) ?? session.metrics;
+  const { outcome, promotedPatterns, displacedPatterns } =
+    outcomeForMetrics(finalMetrics);
+
+  const record: ExperimentRecord = {
+    id: session.id,
+    seed: session.seed,
+    createdAt: "2026-03-29T00:00:00.000Z",
+    featuredTopicId: session.featuredTopicId,
+    topic: session.topic,
+    personaIds: [...session.personaIds],
+    personaNames: [...session.personaNames],
+    actionIds: [...session.actionIds],
+    rounds: session.rounds.map((round) => ({
+      ...round,
+      metrics: metricSnapshot(round.metrics),
+      comments: round.comments.map((comment) => ({ ...comment })),
+    })),
+    metricsHistory: session.metricsHistory.map(metricSnapshot),
+    stageSummary: "",
+    outcome,
+    promotedPatterns,
+    displacedPatterns,
+    contentVersion: CONTENT_VERSION,
+    rulesVersion: RULES_VERSION,
+  };
+
+  record.stageSummary = stageSummary(record);
+
+  return record;
+}
+
+export function createExperimentSession(input: ExperimentInput): ExperimentSession {
+  const topic = normalizeTopic(input.topic);
+  const seed = hashText([input.featuredTopicId, topic, input.personaIds.join(",")].join("|"));
+  const metrics = initialMetrics(seed);
+  const id = `${input.featuredTopicId}-${seed}`;
+  const rounds = [
+    buildRound({
+      round: 1,
+      topic,
+      personaIds: input.personaIds,
+      metrics,
+      actionIds: [],
+      seed,
+    }),
+  ];
+
+  return {
+    id,
+    seed,
+    featuredTopicId: input.featuredTopicId,
+    topic,
+    personaIds: [...input.personaIds],
+    personaNames: input.personaIds.map(personaName),
+    currentRound: 1,
+    totalRounds: TOTAL_ROUNDS,
     rounds,
+    metrics: metricSnapshot(metrics),
+    metricsHistory: [metricSnapshot(metrics)],
+    actionIds: [],
+  };
+}
+
+export function advanceExperimentSession(
+  session: ExperimentSession,
+  actionId: PlatformActionId,
+): SessionAdvanceResult {
+  if (session.currentRound > session.totalRounds) {
+    return {
+      kind: "completed",
+      record: buildRecord(session),
+    };
+  }
+
+  const nextMetrics = applyAction(session.metrics, actionId);
+  const actionIds = [...session.actionIds, actionId];
+  const updatedRounds = [
+    ...session.rounds.slice(0, -1),
+    annotateRound(session.rounds.at(-1) ?? session.rounds[0], actionId),
+  ];
+  const metricsHistory = [...session.metricsHistory, metricSnapshot(nextMetrics)];
+
+  if (session.currentRound === session.totalRounds) {
+    return {
+      kind: "completed",
+      record: buildRecord({
+        ...session,
+        rounds: updatedRounds,
+        actionIds,
+        metrics: nextMetrics,
+        metricsHistory,
+      }),
+    };
+  }
+
+  const nextRound = buildRound({
+    round: session.currentRound + 1,
+    topic: session.topic,
+    personaIds: session.personaIds,
+    metrics: nextMetrics,
+    actionIds,
+    seed: session.seed,
+  });
+
+  return {
+    kind: "in_progress",
+    session: {
+      ...session,
+      currentRound: session.currentRound + 1,
+      rounds: [...updatedRounds, nextRound],
+      metrics: nextMetrics,
+      metricsHistory,
+      actionIds,
+    },
   };
 }
 
 export function createExperimentRecord(input: ExperimentInput): ExperimentRecord {
-  const topic = normalizeTopic(input.topic);
-  const seed = hashText(
-    [input.featuredTopicId, topic, input.rewardMode, input.personaIds.join(",")].join(
-      "|",
-    ),
-  );
-  const worlds = [
-    buildWorld({
-      id: "world-a",
-      topic,
-      rewardMode: input.rewardMode,
-      personaIds: input.personaIds,
-      seed,
-    }),
-    buildWorld({
-      id: "world-b",
-      topic,
-      rewardMode: input.rewardMode,
-      personaIds: input.personaIds,
-      seed,
-    }),
-  ];
-  const turningRound = input.rewardMode === "on" ? 4 : 6;
-  const turningRoundRecord = worlds[1].rounds[turningRound - 1];
+  const actionIds =
+    input.actionIds ?? [
+      "amplify-emotion",
+      "amplify-conflict",
+      "reward-spectacle",
+      "suppress-context",
+      "reward-spectacle",
+      "amplify-conflict",
+    ];
+  let session = createExperimentSession(input);
 
-  return {
-    id: `${input.featuredTopicId}-${input.rewardMode}-${seed}`,
-    seed,
-    createdAt: "2026-03-27T00:00:00.000Z",
-    featuredTopicId: input.featuredTopicId,
-    topic,
-    rewardMode: input.rewardMode,
-    personaIds: [...input.personaIds],
-    personaNames: input.personaIds.map(personaName),
-    stageSummary:
-      input.rewardMode === "on"
-        ? "同一个问题在双世界里滑向了两种终局：一个世界还在勉强回答问题，另一个世界已经开始只剩下谁更有资格发火。"
-        : "热度奖励被收紧后，双世界仍会分叉，但现场不再那么快跌进全面站队，问题还能偶尔被拉回桌面。",
-    contentVersion: CONTENT_VERSION,
-    rulesVersion: RULES_VERSION,
-    worlds,
-    turningPoint: {
-      kind: "ready",
-      round: turningRoundRecord.round,
-      speaker: turningRoundRecord.speaker,
-      quote: turningRoundRecord.text,
-      whyItMatters:
-        input.rewardMode === "on"
-          ? "这是第一句把“回应问题”翻译成“审查你配不配开口”的话。后面的跟进不再补充问题，只是在放大这一层资格判断。"
-          : "这是这次实验里最明显的转折点。虽然现场还没彻底爆炸，但从这里开始，大家已经更在乎姿态位置，而不是问题本身。",
-      amplification:
-        input.rewardMode === "on"
-          ? "平台把它推成高效传播节点，因为它够短、够绝对，也足够方便别人借题站队。"
-          : "即使热度奖励被收紧，这类更方便归类彼此的短句仍然更容易被接住，只是扩散速度被压慢了。",
-      contextBefore: worlds[1].rounds[turningRound - 2]?.text ?? worlds[1].rounds[0].text,
-      contextAfter:
-        worlds[1].rounds[turningRound]?.text ??
-        worlds[1].rounds[worlds[1].rounds.length - 1].text,
-    },
-    rescue:
-      input.rewardMode === "on"
-        ? {
-            kind: "ready",
-            changedCondition:
-              "关闭热度奖励，让高姿态表达不再自动拿走最高曝光。",
-            verdict:
-              "讨论不会立刻温和，但至少能把解释经验和承认复杂度的空间抢回来。",
-            retainedSignal:
-              "经验分享者和相对缓慢的解释重新回到前排，问题再次拥有被回答的可能。",
-            cost: "争论仍然存在，只是失去了一键升温的加速器。",
-            simplified: false,
-          }
-        : {
-            kind: "ready",
-            changedCondition:
-              "继续压低站队式传播，把更短更硬的话从自动高位拿下来。",
-            verdict:
-              "现场不会回到完全理性，但能避免滑向“谁该被赶出现场”的全面清算。",
-            retainedSignal:
-              "原问题和现实处境还能偶尔回到中心，不会被姿态语句完全替代。",
-            cost: "讨论节奏会更慢，结论感会变弱，但可解释性会明显提升。",
-            simplified: false,
-          },
-  };
+  for (const actionId of actionIds.slice(0, -1)) {
+    const result = advanceExperimentSession(session, actionId);
+    if (result.kind !== "in_progress") {
+      return result.record;
+    }
+    session = result.session;
+  }
+
+  const finalResult = advanceExperimentSession(session, actionIds.at(-1) ?? "reward-spectacle");
+
+  if (finalResult.kind === "completed") {
+    return finalResult.record;
+  }
+
+  return buildRecord(finalResult.session);
 }
 
 function isString(value: unknown): value is string {
@@ -608,7 +847,53 @@ function isString(value: unknown): value is string {
 }
 
 function isPhase(value: unknown): value is ExperimentPhase {
-  return value === "正常讨论" || value === "立场固化" || value === "舆论失控";
+  return (
+    value === "正常讨论" ||
+    value === "立场固化" ||
+    value === "表演升级" ||
+    value === "原问题消失"
+  );
+}
+
+function isPlatformActionId(value: unknown): value is PlatformActionId {
+  return platformActions.some((action) => action.id === value);
+}
+
+function isMetricSnapshot(value: unknown): value is MetricSnapshot {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<MetricSnapshot>;
+  return (
+    typeof candidate.emotion === "number" &&
+    typeof candidate.conflict === "number" &&
+    typeof candidate.drift === "number"
+  );
+}
+
+function parseComment(value: unknown): ExperimentComment | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const candidate = value as Partial<ExperimentComment>;
+
+  if (
+    !isString(candidate.personaId) ||
+    !isString(candidate.speaker) ||
+    !isString(candidate.role) ||
+    !isString(candidate.text)
+  ) {
+    return null;
+  }
+
+  return {
+    personaId: candidate.personaId,
+    speaker: candidate.speaker,
+    role: candidate.role,
+    text: candidate.text,
+  };
 }
 
 function parseRound(value: unknown): ExperimentRound | null {
@@ -616,141 +901,69 @@ function parseRound(value: unknown): ExperimentRound | null {
     return null;
   }
 
-  const round = (value as { round?: unknown }).round;
-  const phase = (value as { phase?: unknown }).phase;
-  const speaker = (value as { speaker?: unknown }).speaker;
-  const text = (value as { text?: unknown }).text;
-  const note = (value as { note?: unknown }).note;
+  const candidate = value as Partial<ExperimentRound>;
 
   if (
-    typeof round !== "number" ||
-    !isPhase(phase) ||
-    !isString(speaker) ||
-    !isString(text) ||
-    !isString(note)
+    typeof candidate.round !== "number" ||
+    !isPhase(candidate.phase) ||
+    !isString(candidate.focus) ||
+    !isString(candidate.rewardSignal) ||
+    !isMetricSnapshot(candidate.metrics) ||
+    !Array.isArray(candidate.comments)
   ) {
     return null;
   }
 
+  const comments = candidate.comments.map(parseComment).filter(Boolean) as ExperimentComment[];
+
+  if (comments.length === 0) {
+    return null;
+  }
+
   return {
-    round,
-    phase,
-    speaker,
-    text,
-    note,
+    round: candidate.round,
+    phase: candidate.phase,
+    focus: candidate.focus,
+    rewardSignal: candidate.rewardSignal,
+    metrics: metricSnapshot(candidate.metrics),
+    comments,
+    selectedActionId: isPlatformActionId(candidate.selectedActionId)
+      ? candidate.selectedActionId
+      : undefined,
+    selectedActionLabel: isString(candidate.selectedActionLabel)
+      ? candidate.selectedActionLabel
+      : undefined,
+    selectedActionImpact: isString(candidate.selectedActionImpact)
+      ? candidate.selectedActionImpact
+      : undefined,
   };
 }
 
-function parseWorld(value: unknown): ExperimentWorld | null {
+function parseOutcome(value: unknown): ExperimentOutcome | null {
   if (!value || typeof value !== "object") {
     return null;
   }
 
-  const candidate = value as Partial<ExperimentWorld>;
+  const candidate = value as Partial<ExperimentOutcome>;
 
   if (
-    (candidate.id !== "world-a" && candidate.id !== "world-b") ||
-    !isString(candidate.label) ||
+    (candidate.archetype !== "站队战场" &&
+      candidate.archetype !== "情绪宣泄池" &&
+      candidate.archetype !== "猎奇表演场") ||
     !isString(candidate.title) ||
     !isString(candidate.verdict) ||
     !isString(candidate.summary) ||
-    !isString(candidate.platformReward) ||
-    !isString(candidate.displacedVoice) ||
-    !Array.isArray(candidate.rounds)
+    !isString(candidate.closingNote)
   ) {
     return null;
   }
 
-  const rounds = candidate.rounds.map(parseRound).filter(Boolean) as ExperimentRound[];
-
-  if (rounds.length === 0) {
-    return null;
-  }
-
-  const phaseSummaries = Array.isArray(candidate.phaseSummaries)
-    ? candidate.phaseSummaries.filter(
-        (item): item is { phase: ExperimentPhase; summary: string } =>
-          !!item &&
-          typeof item === "object" &&
-          isPhase((item as { phase?: unknown }).phase) &&
-          isString((item as { summary?: unknown }).summary),
-      )
-    : [];
-
   return {
-    id: candidate.id,
-    label: candidate.label,
+    archetype: candidate.archetype,
     title: candidate.title,
     verdict: candidate.verdict,
     summary: candidate.summary,
-    platformReward: candidate.platformReward,
-    displacedVoice: candidate.displacedVoice,
-    phaseSummaries,
-    rounds,
-  };
-}
-
-function parseTurningPoint(value: unknown): TurningPointState {
-  if (!value || typeof value !== "object") {
-    return {
-      kind: "error",
-      message: "转折点说明暂时不可用。",
-    };
-  }
-
-  const candidate = value as Partial<TurningPointState>;
-
-  if (
-    candidate.kind === "ready" &&
-    typeof candidate.round === "number" &&
-    isString(candidate.speaker) &&
-    isString(candidate.quote) &&
-    isString(candidate.whyItMatters) &&
-    isString(candidate.amplification) &&
-    isString(candidate.contextBefore) &&
-    isString(candidate.contextAfter)
-  ) {
-    return candidate as TurningPointState;
-  }
-
-  if (candidate.kind === "missing" && isString(candidate.reason)) {
-    return candidate as TurningPointState;
-  }
-
-  return {
-    kind: "error",
-    message: "转折点说明暂时不可用。",
-  };
-}
-
-function parseRescue(value: unknown): RescueState {
-  if (!value || typeof value !== "object") {
-    return {
-      kind: "error",
-      message: "这次没能算出救援世界。",
-    };
-  }
-
-  const candidate = value as Partial<RescueState>;
-
-  if (
-    candidate.kind === "ready" &&
-    isString(candidate.changedCondition) &&
-    isString(candidate.verdict) &&
-    isString(candidate.retainedSignal) &&
-    isString(candidate.cost) &&
-    typeof candidate.simplified === "boolean"
-  ) {
-    return candidate as RescueState;
-  }
-
-  if (candidate.kind === "unsupported" && isString(candidate.reason)) {
-    return candidate as RescueState;
-  }
-
-  return {
-    kind: "error",
-    message: "这次没能算出救援世界。",
+    closingNote: candidate.closingNote,
   };
 }
 
@@ -758,7 +971,7 @@ export function resolveExperimentState(value: unknown): ExperimentState {
   if (!value) {
     return {
       kind: "missing",
-      message: "这次实验没有产出有效结论。",
+      message: "这次实验没有留下可读记录，建议回到首页重新操盘一次。",
     };
   }
 
@@ -777,13 +990,14 @@ export function resolveExperimentState(value: unknown): ExperimentState {
     !isString(candidate.createdAt) ||
     !isString(candidate.featuredTopicId) ||
     !isString(candidate.topic) ||
-    (candidate.rewardMode !== "on" && candidate.rewardMode !== "off") ||
     !Array.isArray(candidate.personaIds) ||
     !Array.isArray(candidate.personaNames) ||
+    !Array.isArray(candidate.actionIds) ||
+    !Array.isArray(candidate.rounds) ||
+    !Array.isArray(candidate.metricsHistory) ||
     !isString(candidate.stageSummary) ||
     !isString(candidate.contentVersion) ||
-    !isString(candidate.rulesVersion) ||
-    !Array.isArray(candidate.worlds)
+    !isString(candidate.rulesVersion)
   ) {
     return {
       kind: "invalid",
@@ -791,9 +1005,29 @@ export function resolveExperimentState(value: unknown): ExperimentState {
     };
   }
 
-  const worlds = candidate.worlds.map(parseWorld).filter(Boolean) as ExperimentWorld[];
+  const rounds = candidate.rounds.map(parseRound).filter(Boolean) as ExperimentRound[];
+  const metricsHistory = candidate.metricsHistory.filter(isMetricSnapshot).map(metricSnapshot);
+  const outcome = parseOutcome(candidate.outcome);
+  const actionIds = candidate.actionIds.filter(isPlatformActionId);
+  const personaIds = candidate.personaIds.filter(isString);
+  const personaNames = candidate.personaNames.filter(isString);
+  const promotedPatterns = Array.isArray(candidate.promotedPatterns)
+    ? candidate.promotedPatterns.filter(isString)
+    : [];
+  const displacedPatterns = Array.isArray(candidate.displacedPatterns)
+    ? candidate.displacedPatterns.filter(isString)
+    : [];
 
-  if (worlds.length === 0) {
+  if (
+    rounds.length === 0 ||
+    metricsHistory.length < 2 ||
+    !outcome ||
+    actionIds.length === 0 ||
+    personaIds.length === 0 ||
+    personaNames.length === 0 ||
+    promotedPatterns.length === 0 ||
+    displacedPatterns.length === 0
+  ) {
     return {
       kind: "invalid",
       message: "实验记录已损坏，暂时无法读取。",
@@ -806,36 +1040,31 @@ export function resolveExperimentState(value: unknown): ExperimentState {
     createdAt: candidate.createdAt,
     featuredTopicId: candidate.featuredTopicId,
     topic: candidate.topic,
-    rewardMode: candidate.rewardMode,
-    personaIds: candidate.personaIds.filter(isString),
-    personaNames: candidate.personaNames.filter(isString),
+    personaIds,
+    personaNames,
+    actionIds,
+    rounds,
+    metricsHistory,
     stageSummary: candidate.stageSummary,
+    outcome,
+    promotedPatterns,
+    displacedPatterns,
     contentVersion: candidate.contentVersion,
     rulesVersion: candidate.rulesVersion,
-    worlds,
-    turningPoint: parseTurningPoint(candidate.turningPoint),
-    rescue: parseRescue(candidate.rescue),
   };
   const versionMessage =
     experiment.contentVersion !== CONTENT_VERSION ||
     experiment.rulesVersion !== RULES_VERSION
-      ? "当前内容包或规则版本已经更新，这份实验与新的重跑结果不能直接对比。"
+      ? "当前内容包或规则版本已经更新，这份记录与新的重跑结果不能直接对比。"
       : undefined;
-
-  if (worlds.length < 2) {
-    return {
-      kind: "partial",
-      experiment,
-      availableWorlds: worlds,
-      message:
-        "当前记录只保住了一个世界的证据，无法形成完整对照，但你仍可以继续阅读现有部分。",
-      versionMessage,
-    };
-  }
 
   return {
     kind: "success",
     experiment,
     versionMessage,
   };
+}
+
+export function metricLabel(metric: MetricKey) {
+  return metricLabels[metric];
 }
