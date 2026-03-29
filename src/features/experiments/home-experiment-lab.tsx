@@ -8,11 +8,13 @@ import {
   featuredTopics,
   metricLabel,
   platformActions,
+  personaCatalog,
   type ExperimentRecord,
   type ExperimentSession,
   type MetricKey,
   type PlatformActionId,
 } from "./experiment-engine";
+import { RoundtableCorpusBoard } from "./roundtable-corpus-board";
 import { saveExperimentRecord } from "./experiment-storage";
 
 type HomeExperimentLabProps = {
@@ -69,6 +71,9 @@ export function HomeExperimentLab({
 }: HomeExperimentLabProps) {
   const [featuredTopicId, setFeaturedTopicId] = useState<string>(featuredTopics[0].id);
   const [topic, setTopic] = useState<string>(featuredTopics[0].prompt);
+  const [selectedCorpusPersonaId, setSelectedCorpusPersonaId] = useState<string>(
+    personaCatalog[0].id,
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [session, setSession] = useState<ExperimentSession | null>(null);
   const currentTopic = useMemo(
@@ -365,6 +370,12 @@ export function HomeExperimentLab({
               ))}
             </ol>
           </section>
+
+          <RoundtableCorpusBoard
+            featuredTopicId={featuredTopicId}
+            selectedPersonaId={selectedCorpusPersonaId}
+            onSelectPersonaId={setSelectedCorpusPersonaId}
+          />
 
           <section className="grid gap-4 border border-[color:var(--line)] bg-[rgba(122,148,170,0.08)] p-5">
             <p className="text-xs uppercase tracking-[0.2em] text-[color:var(--muted)]">

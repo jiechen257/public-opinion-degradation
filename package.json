@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "corpus:bootstrap": "node scripts/build-roundtable-corpus.mjs && node scripts/bootstrap-roundtable-reference-fixtures.mjs",
+    "corpus:build": "node scripts/build-roundtable-corpus.mjs",
+    "corpus:import": "node scripts/import-roundtable-reference.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

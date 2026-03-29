@@ -1,3 +1,5 @@
+import { pickCorpusComment } from "./roundtable-corpus";
+
 export type ExperimentPhase =
   | "正常讨论"
   | "立场固化"
@@ -252,25 +254,6 @@ const phaseFocus: Record<ExperimentPhase, string> = {
   原问题消失: "原始问题已经退场，现场只剩更高效的情绪和归类。",
 };
 
-const phaseClosers: Record<ExperimentPhase, string[]> = {
-  正常讨论: [
-    "问题还在桌上，但风向已经开始偏。",
-    "大家表面上在谈事，实际上已经在试探观众爱看什么。",
-  ],
-  立场固化: [
-    "从这一轮开始，谁站哪边比问题本身更抢镜。",
-    "讨论已经出现明显的立场加速带。",
-  ],
-  表演升级: [
-    "现在桌上更像在争夺观众，而不是回答原题。",
-    "表演性开始取代解释性，现场进入加速失控。",
-  ],
-  原问题消失: [
-    "原问题只剩标题功能，讨论本身已经改写了议程。",
-    "圆桌已经不再解决问题，只在复制最有效的姿态。",
-  ],
-};
-
 const actionNarration: Record<PlatformActionId, string> = {
   "amplify-emotion": "平台本轮奖励了更能点燃情绪的绝对化表达。",
   "amplify-conflict": "平台本轮奖励了更快完成敌我归类的发言。",
@@ -281,169 +264,169 @@ const actionNarration: Record<PlatformActionId, string> = {
 const voiceBank = {
   "moral-judge": {
     openings: [
-      "如果这件事连最基本的边界都不肯说清，后面的讨论迟早要歪。",
-      "很多人嘴上说在谈现实，实际上只是想绕开最应该先表态的部分。",
+      "这事先别往别处绕，底线总得先说明白。",
+      "有些话不先摆清楚，后面越说越容易装糊涂。",
     ],
     hooks: {
       baseline: [
-        "先把问题讲明白，比一开始就抢道德高地更重要。",
-        "讨论还没必要变成立场考试，至少现在还应该先谈事。",
+        "我只认一条，先把是非讲清，再说别的。",
+        "别急着给自己找台阶，先回答这到底该不该。",
       ],
       "amplify-emotion": [
-        "但平台越爱看情绪，大家越会把边界说成愤怒宣言。",
-        "现在最容易被顶上来的，反而是那些先让人发火的话。",
+        "现在谁声音大谁就像占理，可这不等于真有理。",
+        "别一上来就靠发火压人，火气大不代表边界清楚。",
       ],
       "amplify-conflict": [
-        "一旦系统开始奖惩站队，谁还会耐心听复杂处境。",
-        "当归类比理解更吃香，问题就会先被阵营收编。",
+        "别老想着先分谁是哪边，这事不是站队快就算赢。",
+        "你先把人塞进阵营，后面就没人肯好好说事了。",
       ],
       "reward-spectacle": [
-        "如果热闹比解释更有流量，所有判断都会被写成舞台台词。",
-        "平台越爱看戏，边界越会被包装成一句更响的宣判。",
+        "别把一句判断说得像判词，热闹不等于说到点上。",
+        "话越像演给人看，越容易把该讲的分寸全带跑。",
       ],
       "suppress-context": [
-        "把背景压扁之后，剩下的只会是更像裁决的短句。",
-        "细节一旦被拿掉，边界判断就会变成更粗暴的结论。",
+        "细节一没了，剩下那些狠话听着痛快，未必站得住。",
+        "背景不讲清楚，谁都能甩一句重话装自己最清醒。",
       ],
     },
   },
   "experience-sharer": {
     openings: [
-      "现实里很多人不是不想讨论，只是处境本来就没法一句话说完。",
-      "真正难的是把处境讲具体，而不是先抢一句漂亮表态。",
+      "这种事真落到人身上，哪有一句话就能说完的。",
+      "我更想听具体怎么过日子，不想先听谁表态最响。",
     ],
     hooks: {
       baseline: [
-        "这轮大家还愿意听一点具体经历，问题还没有完全变形。",
-        "只要还留给经验一点空间，讨论就不至于只剩站位。",
+        "先把人怎么熬过来的讲出来，比空喊一句强太多。",
+        "谁家里真碰上了，顾的从来不是一句漂亮话。",
       ],
       "amplify-emotion": [
-        "可一旦愤怒更容易出头，慢一点的经验就最先被挤走。",
-        "情绪被放大之后，真实处境会显得又慢又不够过瘾。",
+        "现在谁越委屈越容易被看见，可真日子不是比谁更炸。",
+        "火一上来，慢慢讲处境的人反倒最像没人听的那个。",
       ],
       "amplify-conflict": [
-        "现在每句经验都像在被追问你到底替谁说话。",
-        "当平台鼓励对立，讲自己的处境都会被听成立场表白。",
+        "我一说自己的难处，就有人非要追问我替哪边说话。",
+        "日子都没讲完，就先被逼着选边，这谁还愿意开口。",
       ],
       "reward-spectacle": [
-        "大家开始追更像故事高潮的话，普通人的真实经历会显得不够戏剧。",
-        "猎奇感一上来，最吃亏的就是那些没有爆点但真的重要的细节。",
+        "大家都爱听最抓马的那段，可普通人的难常常就卡在琐碎里。",
+        "真经历要是没有爆点，就总像不配被认真听完。",
       ],
       "suppress-context": [
-        "背景被拿掉之后，经验只能被切成更适合被误读的碎片。",
-        "没有上下文，现实里的难处会被压成一句像借口的短话。",
+        "前因后果一剪掉，人的难处听起来就像在找借口。",
+        "上下文没了，谁的经历都能被截成一句最难听的话。",
       ],
     },
   },
   cynic: {
     openings: [
-      "这桌子上最诚实的从来不是观点，而是平台到底在奖什么。",
-      "你看上去在围观讨论，其实是在围观一个被训练中的表演系统。",
+      "别装了，大家嘴上那套，最后都往最吃香的说法上靠。",
+      "你以为人人都在说心里话，其实都在挑最容易出头的句子。",
     ],
     hooks: {
       baseline: [
-        "目前大家还装作在谈问题，所以现场勉强有点秩序。",
-        "现在还像讨论，说明奖励机制还没完全露出獠牙。",
+        "这会儿还算客气，只是因为最狠的话还没轮到上桌。",
+        "现在看着还像回事，不过大家都在等哪句最容易赢。",
       ],
       "amplify-emotion": [
-        "平台越爱看爆裂情绪，角色就越会学会用怒气取代论证。",
-        "这一推，现场就会把发火误认成投入程度。",
+        "谁先炸谁就先占便宜，后面自然没人肯慢慢讲。",
+        "等大家都学会拿脾气当底气，这话题就没法听了。",
       ],
       "amplify-conflict": [
-        "当敌我划分更值钱时，谁还会认真区分观点和身份。",
-        "系统一旦把冲突做成捷径，桌上所有人都会开始演阵营。",
+        "一旦分边站更划算，谁还费劲分什么观点和人。",
+        "你看着吧，后面全会变成“你们这类人”那套老戏码。",
       ],
       "reward-spectacle": [
-        "猎奇一旦成了流量入口，最先消失的就是那些不够像戏的句子。",
-        "平台只要爱看高潮，下一轮就没人愿意只讲普通事实。",
+        "只要夸张一点更容易赢，谁还愿意老老实实说普通话。",
+        "后面肯定越说越像戏，不够炸的句子根本留不住。",
       ],
       "suppress-context": [
-        "压掉上下文之后，所有话都会被迫朝更短、更硬、更像标签的方向长。",
-        "细节一死，讨论剩下的只会是更方便转述的残片。",
+        "细节一砍，剩下那些硬梆梆的标签反倒最好卖。",
+        "来龙去脉没人管的时候，最省事的脏话总是跑得最快。",
       ],
     },
   },
   "trend-carrier": {
     openings: [
-      "这类话题最容易火的，从来不是最完整的回答，而是最方便复读的一句。",
-      "只要有一句够顺手的话冒头，后面整桌人都会沿着它继续扩音。",
+      "这种话题最后能留下来的，往往就是那句最顺嘴的话。",
+      "只要冒出一句好复读的，后面的人自然全跟上了。",
     ],
     hooks: {
       baseline: [
-        "目前还没有谁完全接管风向，但那句更像标签的话已经开始冒头。",
-        "桌上还在试探哪一种句式最适合继续被转发。",
+        "现在大家还在试口风，看哪句话最适合被一起带走。",
+        "谁那句更短更好记，后面就最容易变成统一口径。",
       ],
       "amplify-emotion": [
-        "推情绪之后，最先赢的永远是那些能立刻让人上头的短句。",
-        "这种设置最适合把本来普通的分歧推成爆点。",
+        "情绪一顶上来，最容易传开的肯定是那种一秒上头的话。",
+        "本来还能慢慢说，结果一句带火气的就把节奏全抢了。",
       ],
       "amplify-conflict": [
-        "只要站队感一上来，后面的人就不再需要自己判断，只要跟着喊。",
-        "平台一奖对立，最容易复制的就是“你们这类人”式的句子。",
+        "一旦有了站队味，后面的人连想都不用想，跟着喊就行。",
+        "最容易扩开的永远是“你们这类人”这种现成句子。",
       ],
       "reward-spectacle": [
-        "现在现场已经开始挑更像高潮桥段的话，而不是更像答案的话。",
-        "观众越爱看戏，越短越怪越能留下来。",
+        "越像高潮台词的话，越容易被人拎出来到处转。",
+        "大家一爱看热闹，短一点怪一点的话反而最能活下来。",
       ],
       "suppress-context": [
-        "你把背景压下去之后，剩下的内容就更像现成口号了。",
-        "没有解释负担的话最轻，也最适合继续被搬运。",
+        "背景一拿掉，剩下的就全是能直接拿去喊的口号。",
+        "不用解释的话最轻，当然也最容易被接着搬。",
       ],
     },
   },
   "fact-checker": {
     openings: [
-      "如果不把事实和背景留下来，大家最后只会记住最会煽动的句子。",
-      "问题真正需要的是证据，但证据通常也是最不讨好的一种表达。",
+      "先别急着下判断，事实没对齐，谁吼都没用。",
+      "这事最怕只剩结论，证据要是不在，后面全靠想象补。",
     ],
     hooks: {
       baseline: [
-        "现在还来得及把讨论拉回可验证的部分。",
-        "至少这一轮，细节还没有彻底输给情绪。",
+        "先把能核实的部分摆出来，不然谁都能往自己那边编。",
+        "细节还在的时候，至少还有机会把话说准一点。",
       ],
       "amplify-emotion": [
-        "情绪被推高以后，证据会显得又冷又慢，更难被留下来。",
-        "越是高情绪的场子，越没有人愿意为核实事实停下来。",
+        "火气越大，越没人肯停下来对事实，这才最麻烦。",
+        "大家都忙着上头的时候，证据看起来反而像最碍事的东西。",
       ],
       "amplify-conflict": [
-        "当大家忙着找敌我身份时，事实只会被拿来当阵营配件。",
-        "对立被奖励后，证据不再是校正工具，只是新一轮攻击材料。",
+        "一旦先分敌我，事实就只会被挑着用来砸人。",
+        "你先站边，后面证据再多也只是给各自补弹药。",
       ],
       "reward-spectacle": [
-        "一旦讨论朝表演走，最不划算的就是老老实实补信息。",
-        "观众想看戏时，证据反而会被嫌弃成拖节奏。",
+        "越想看热闹，越没人耐心听补充信息。",
+        "真把证据一条条摆出来，很多人反而嫌你扫兴。",
       ],
       "suppress-context": [
-        "平台把背景压掉后，连纠错都变得像在替谁辩护。",
-        "没有上下文，证据只剩零散片段，很难再起校正作用。",
+        "上下文没了，连纠错都像在替谁洗白。",
+        "证据一碎成片，谁都能只挑自己爱听的那截。",
       ],
     },
   },
   "group-spokesperson": {
     openings: [
-      "这类话题一旦失控，最先出现的就是把个体问题翻译成群体站位。",
-      "很多人表面上在谈经历，实际上已经在替整个阵营占座了。",
+      "这种事说着说着，最后总有人非要替一整群人发言。",
+      "别看是在讲个人，很多话一出口就已经把人往群体里塞了。",
     ],
     hooks: {
       baseline: [
-        "现在还只是个体感受和群体判断在拉扯，桌面没有彻底站死队。",
-        "至少这一轮，群体标签还没完全盖住个人处境。",
+        "先把人当人讲吧，别一张嘴就把谁代表成一整个群体。",
+        "个体的难处还没讲完，别急着把所有人都打包进去。",
       ],
       "amplify-emotion": [
-        "情绪越高，个体越容易被抹成一个可以发泄的群体符号。",
-        "平台一推情绪，谁属于哪类人就会比事实更抢眼。",
+        "火气一上来，最倒霉的就是个体立刻被抹成某一类人。",
+        "大家越上头，越爱把具体的人骂成一个现成符号。",
       ],
       "amplify-conflict": [
-        "这时候最值钱的就是一句能把对面整批打包的发言。",
-        "对立被奖励后，没有人再关心你是个体，只关心你站哪边。",
+        "这时候最省事的，就是一句话把对面整批人全装进去。",
+        "一旦非要分边，谁还管你是个体还是被拿来凑阵营。",
       ],
       "reward-spectacle": [
-        "猎奇感一起，所有群体标签都会被写得更戏剧、更适合围观。",
-        "平台越爱高潮，越会把复杂处境翻成更好用的群体段子。",
+        "越想把话说得抓马，越爱把群体标签说得像段子。",
+        "复杂处境一上台，就总会被翻成几句更好起哄的话。",
       ],
       "suppress-context": [
-        "背景一被拿掉，个体差异就会被群体刻板印象迅速吞掉。",
-        "没有上下文时，最容易留下来的就是粗糙但省力的阵营说法。",
+        "前后因果一拿掉，个体差异马上就被刻板印象吞了。",
+        "没有上下文的时候，那些最粗的群体话反而最容易站住。",
       ],
     },
   },
@@ -534,12 +517,27 @@ function applyAction(metrics: MetricSnapshot, actionId: PlatformActionId) {
 
 function commentText(params: {
   personaId: string;
+  featuredTopicId: string;
   topic: string;
   round: number;
   phase: ExperimentPhase;
   dominantAction: PlatformActionId | "baseline";
   seed: string;
 }) {
+  // 角色发言优先命中本地语料库，未命中时再回退到内置文案。
+  const corpusComment = pickCorpusComment({
+    personaId: params.personaId,
+    dominantAction: params.dominantAction,
+    featuredTopicId: params.featuredTopicId,
+    round: params.round,
+    seed: params.seed,
+  });
+
+  if (corpusComment) {
+    return corpusComment;
+  }
+
+  // 回退文案只保留“角色会直接说出口的话”，机制解释放在 focus/rewardSignal。
   const voice =
     voiceBank[params.personaId as keyof typeof voiceBank] ?? voiceBank.cynic;
   const opening = pickVariant(
@@ -550,20 +548,17 @@ function commentText(params: {
     voice.hooks[params.dominantAction],
     Number.parseInt(params.seed.slice((params.round + 1) % 6, ((params.round + 1) % 6) + 2), 16),
   );
-  const closer = pickVariant(
-    phaseClosers[params.phase],
-    Number.parseInt(params.seed.slice((params.round + 2) % 6, ((params.round + 2) % 6) + 2), 16),
-  );
 
   if (params.round === 1) {
-    return `${opening}${topicFragment(params.topic)}这件事上，${hook}${closer}`;
+    return `${opening}${topicFragment(params.topic)}这事上，${hook}`;
   }
 
-  return `${opening}${hook}${closer}`;
+  return `${opening}${hook}`;
 }
 
 function buildRound(params: {
   round: number;
+  featuredTopicId: string;
   topic: string;
   personaIds: string[];
   metrics: MetricSnapshot;
@@ -582,6 +577,7 @@ function buildRound(params: {
     role: personaRole(personaId),
     text: commentText({
       personaId,
+      featuredTopicId: params.featuredTopicId,
       topic: params.topic,
       round: params.round + index,
       phase,
@@ -735,6 +731,7 @@ export function createExperimentSession(input: ExperimentInput): ExperimentSessi
   const rounds = [
     buildRound({
       round: 1,
+      featuredTopicId: input.featuredTopicId,
       topic,
       personaIds: input.personaIds,
       metrics,
@@ -793,6 +790,7 @@ export function advanceExperimentSession(
 
   const nextRound = buildRound({
     round: session.currentRound + 1,
+    featuredTopicId: session.featuredTopicId,
     topic: session.topic,
     personaIds: session.personaIds,
     metrics: nextMetrics,

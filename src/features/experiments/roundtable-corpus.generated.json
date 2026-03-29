@@ -1,0 +1,1015 @@
+{
+  "version": "2026-03-29",
+  "generatedAt": "2026-03-29T13:30:17.299Z",
+  "sqlitePath": "data/roundtable-corpus.sqlite",
+  "sourceCount": 4,
+  "exampleCount": 72,
+  "sources": [
+    {
+      "id": "local-curated-seed-2026-03-29",
+      "platform": "mixed-forum",
+      "sourceType": "curated-seed",
+      "title": "Roundtable persona starter set",
+      "url": null,
+      "licenseNote": "Local prototype seed for role-aligned roundtable corpus.",
+      "notes": "用于第一版角色语料打底，后续可被外部公开语料替换或扩充。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan",
+      "platform": "Baidu Tieba",
+      "sourceType": "reference-dataset",
+      "title": "Baidu_Tieba_SunXiaochuan",
+      "url": "https://huggingface.co/datasets/Orphanage/Baidu_Tieba_SunXiaochuan",
+      "licenseNote": "待后续核验",
+      "notes": "贴吧风格参考源，当前脚本支持导入本地导出的 JSON 或 JSONL。"
+    },
+    {
+      "id": "reference-robert-llm-data",
+      "platform": "Weibo",
+      "sourceType": "reference-dataset",
+      "title": "robert-llm-data",
+      "url": "https://huggingface.co/datasets/Chishui-Chen/robert-llm-data",
+      "licenseNote": "apache-2.0",
+      "notes": "通过 Hugging Face 单文件 JSONL 导入评论风格语料。"
+    },
+    {
+      "id": "reference-zhihu-kol",
+      "platform": "Zhihu",
+      "sourceType": "reference-dataset",
+      "title": "Zhihu-KOL",
+      "url": "https://huggingface.co/datasets/wangrui6/Zhihu-KOL",
+      "licenseNote": "OpenAssistant",
+      "notes": "数据页显示主要字段为 INSTRUCTION / RESPONSE / SOURCE / METADATA；当前脚本支持导入本地导出的 JSON 或 JSONL。"
+    }
+  ],
+  "personaExamples": [
+    {
+      "id": "cynic-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "舆论"
+      ],
+      "intensity": 5,
+      "text": "一旦把人按阵营摆好，连呼吸都能被听成立场。这样最方便，反正没人还记得最开始在问什么。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0004",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "cynic",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "楼里最省事的玩法就是把个体经历直接翻成‘你们这类人都这样’，一秒就把讨论带偏。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0002",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "cynic",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立"
+      ],
+      "intensity": 3,
+      "text": "你先把人按阵营分好，后面谁还会管最开始的问题是什么，反正大家只剩互相审判。"
+    },
+    {
+      "id": "cynic-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "舆论"
+      ],
+      "intensity": 5,
+      "text": "这时候最吃香的就是谁先拍桌子。等大家都学会拿火气当筹码，后面谁还肯慢慢讲。"
+    },
+    {
+      "id": "cynic-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "舆论",
+        "道德"
+      ],
+      "intensity": 3,
+      "text": "这种题底下最省流量的回答永远是“当妈就该牺牲”。一句话听着体面，真正要辞职、断社保、把简历空两年的人又不是评论区。"
+    },
+    {
+      "id": "cynic-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "舆论",
+        "吃苦"
+      ],
+      "intensity": 3,
+      "text": "每次聊加班，总有人端出“我们那代更苦”这套老词。最省事的玩法就是把公司排班问题洗成个人娇气，这样谁都不用碰制度。"
+    },
+    {
+      "id": "cynic-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "安全表达",
+        "舆论"
+      ],
+      "intensity": 3,
+      "text": "现在很多人不是在讨论问题，是在写免责声明。把该背的风险先推干净，再慢慢补观点，这套动作本身就说明大家默认内容不如姿态安全。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0003",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "cynic",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作"
+      ],
+      "intensity": 3,
+      "text": "每次聊加班，总有人把公司排班问题洗成个人娇气，这套话最省事，因为谁都不用碰制度。"
+    },
+    {
+      "id": "cynic-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "舆论"
+      ],
+      "intensity": 4,
+      "text": "话一旦往高潮桥段那边拐，普通事实就不值钱了。谁肯老实说话，谁就第一个被淹没。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0009",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "cynic",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "大家越爱看热闹，越喜欢把普通人的麻烦剪成抓马桥段，最后真正有用的信息全被挤掉了。"
+    },
+    {
+      "id": "cynic-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "cynic",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "舆论"
+      ],
+      "intensity": 4,
+      "text": "来龙去脉一删，剩下那些最像标签的话跑得最快。毕竟骂一句总比解释十句划算。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0009",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "cynic",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "前后因果一删，剩下的狠话当然最容易被顶上去，可这不等于它最接近事实。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0005",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "cynic",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "前后因果一删，剩下那些最像标签的话跑得最快，毕竟骂一句总比解释十句划算。"
+    },
+    {
+      "id": "experience-sharer-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "经历"
+      ],
+      "intensity": 4,
+      "text": "我刚讲到自己碰上的情况，就有人追着问我到底替哪边说话。可生活里大多数人先遇到的是麻烦，不是阵营。"
+    },
+    {
+      "id": "experience-sharer-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "经历"
+      ],
+      "intensity": 4,
+      "text": "现在谁越委屈越容易被看见，可真正麻烦的部分恰恰是那些说起来不够炸、但每天都在磨人的日常。"
+    },
+    {
+      "id": "experience-sharer-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "育儿",
+        "职业"
+      ],
+      "intensity": 2,
+      "text": "我表姐生完孩子那两年每天四点半起床挤奶，晚上还要改方案到十一点。你问她愿不愿意牺牲，她只会说很多时候根本不是自愿，是没人替她分担。"
+    },
+    {
+      "id": "experience-sharer-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "职场",
+        "经历"
+      ],
+      "intensity": 2,
+      "text": "我刚工作那会儿在广告公司连着三周凌晨一点回家，第二天九点半继续开会。后来甲状腺出问题，领导还是一句“年轻人多扛扛”，你说这种压力怎么可能只是矫情。"
+    },
+    {
+      "id": "experience-sharer-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "表达",
+        "经历"
+      ],
+      "intensity": 2,
+      "text": "我最怕那种开头先连说三句“我不是谁谁谁”“我绝对支持什么”，结果真正经历只剩两行。人一旦忙着证明自己无害，真实处境反而最先被删掉。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0002",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "我室友去年连着一个月夜班，白天还得回消息，最后体检直接亮红灯，这种压力真不是一句脆弱能带过去的。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0007",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "我姐带娃那两年最难的不是一句牺牲不牺牲，而是晚上冲奶粉、白天赶地铁、回家还得继续改表格。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0001",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作"
+      ],
+      "intensity": 3,
+      "text": "我刚工作那会儿连着三周凌晨一点回家，第二天九点半还要开会，这种压力根本不是一句矫情能带过的。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0007",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice",
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "家庭",
+        "工作"
+      ],
+      "intensity": 2,
+      "text": "我同事去年孩子反复发烧，他白天开会晚上跑医院，月底绩效还被说不够拼，你很难说这只是态度问题。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0000",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭"
+      ],
+      "intensity": 2,
+      "text": "我生完孩子以后有两年几乎没在晚上十一点前睡过，白天上班，回家接着哄睡和改方案。很多人把这叫母爱伟大，但真实处境常常只是没人帮你分担。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0001",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作"
+      ],
+      "intensity": 3,
+      "text": "很多人会很轻易地说年轻人不能吃苦，可真正落到现实里，是有人凌晨一点下班、第二天九点继续开会，这根本不是一句矫情能解释的。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0002",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭"
+      ],
+      "intensity": 2,
+      "text": "如果一个人要在凌晨三点冲奶粉、早上七点送娃、九点半进会议室，你很难再用轻飘飘的‘父母本来就该牺牲’去概括她的处境。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0003",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作"
+      ],
+      "intensity": 3,
+      "text": "我不太认同把抱怨压力直接归类为矫情，因为很多岗位的问题根本不是年轻人能不能吃苦，而是这个工作安排是否还把人当人看。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0004",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场"
+      ],
+      "intensity": 3,
+      "text": "很多人开头先写三句免责声明，不是因为观点更完整，而是因为他们知道姿态如果不先摆安全，后面的内容很可能根本没有人愿意听。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0005",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场"
+      ],
+      "intensity": 3,
+      "text": "我最担心的是，大家把大量篇幅花在证明自己无害上，真正具体的经验和判断反而被压缩成两三句，这样讨论很难不失真。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0006",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "experience-sharer",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作"
+      ],
+      "intensity": 3,
+      "text": "我见过最典型的情况是，一个人连续三周加班到凌晨，身体已经开始出问题，周围人却只评价他是不是抗压差。这样的讨论方式本身就忽略了现实。"
+    },
+    {
+      "id": "experience-sharer-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "经历"
+      ],
+      "intensity": 3,
+      "text": "大家都想听最抓马的那段，可真正把人困住的往往是房租、通勤、孩子发烧这些一点都不传奇的细节。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0003",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "experience-sharer",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "很多老哥上来就说现在的年轻人都不行，可工时表、通勤和绩效截图一摆出来，问题根本不是谁能不能吃苦。"
+    },
+    {
+      "id": "experience-sharer-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "experience-sharer",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "经历"
+      ],
+      "intensity": 3,
+      "text": "前后因果一剪掉，任何人的难处听起来都像找借口。可人不是只活在那一句被截出来的话里。"
+    },
+    {
+      "id": "fact-checker-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "证据"
+      ],
+      "intensity": 4,
+      "text": "一旦先分敌我，证据就会被各自挑着用。真正该做的是把原文、时间顺序和背景先摊开，不是先给人贴阵营标签。"
+    },
+    {
+      "id": "fact-checker-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "证据"
+      ],
+      "intensity": 4,
+      "text": "情绪一高，最先被挤掉的就是证据。可嗓门大不代表事实更完整，截图、时间线和原话才是能校正讨论的东西。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0006",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "fact-checker",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景"
+      ],
+      "intensity": 3,
+      "text": "这种楼里最吃香的不是细节，而是能一秒让人上头的狠话，谁先拍桌子谁就先占便宜。"
+    },
+    {
+      "id": "fact-checker-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "证据",
+        "背景"
+      ],
+      "intensity": 3,
+      "text": "先别急着说父母本来就该牺牲。你至少得把谁辞职、谁带娃、谁还在承担房贷和老人照护这些现实条件对齐，不然这话根本没有信息量。"
+    },
+    {
+      "id": "fact-checker-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "证据",
+        "加班"
+      ],
+      "intensity": 3,
+      "text": "判断年轻人是不是矫情，先看工时、通勤和健康代价。一个人如果连续三周凌晨下班，这不是态度问题，是排班本身已经越线。"
+    },
+    {
+      "id": "fact-checker-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "证据",
+        "表达"
+      ],
+      "intensity": 3,
+      "text": "如果一段话前半段全是立场免责声明，后半段只有两句事实，那我更愿意先看后半段。姿态再完整，也不能替代可核实的信息。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0011",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "fact-checker",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "楼里有人贴了工时和请假记录之后，前面那套‘只是态度差’立刻站不住了，所以证据永远比吼得响有用。"
+    },
+    {
+      "id": "fact-checker-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "证据"
+      ],
+      "intensity": 3,
+      "text": "越像高潮桥段的话越容易被记住，但最关键的信息往往藏在不抓马的细节里。你真想判断对错，还是得回到原文和上下文。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0005",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "fact-checker",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 2,
+      "text": "别光看情绪高不高，原帖时间线、聊天记录和前后因果先对齐，不然又是拿半张截图当铁证。"
+    },
+    {
+      "id": "fact-checker-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "fact-checker",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "证据"
+      ],
+      "intensity": 3,
+      "text": "背景一砍，很多说法看起来都像铁证。可没有时间线、来源和前后因果，所谓结论很可能只是被剪过的片段。"
+    },
+    {
+      "id": "group-spokesperson-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "群体"
+      ],
+      "intensity": 4,
+      "text": "对立一被奖励，最省事的话就是把对面整批人打包进去。谁还关心你是具体的人，大家只想知道你到底算哪一边。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0008",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "group-spokesperson",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 2,
+      "text": "只要有人先甩出‘你们这类人’这句话，后面整串评论都会顺着那个句式往下骂。"
+    },
+    {
+      "id": "group-spokesperson-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "群体"
+      ],
+      "intensity": 4,
+      "text": "火气一上来，个体最容易被抹成群体符号。大家骂的看似是一个人，实际上很快就会扩成对一整类人的发泄。"
+    },
+    {
+      "id": "group-spokesperson-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "群体",
+        "立场"
+      ],
+      "intensity": 3,
+      "text": "这类题最容易从个人困境滑成对一整类父母的要求。一个人的家庭分工没谈清，评论区就已经开始替所有母亲或者所有父亲规定该怎么活。"
+    },
+    {
+      "id": "group-spokesperson-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "群体",
+        "职场"
+      ],
+      "intensity": 3,
+      "text": "聊加班也很容易变成对一整代年轻人的性格审判。明明是岗位安排的问题，最后总有人非要把它翻译成“现在这代人都不能吃苦”。"
+    },
+    {
+      "id": "group-spokesperson-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "群体",
+        "表达"
+      ],
+      "intensity": 3,
+      "text": "一旦大家都习惯先把立场话说满，个体表达很快就会被压成群体代表发言。你还没讲自己的处境，别人已经默认你在替某一类人占座。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0008",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "group-spokesperson",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 2,
+      "text": "一到吧里大讨论，就有人自动替所有父母或者所有打工人发言，好像谁先代表整群人谁就更占理。"
+    },
+    {
+      "id": "group-spokesperson-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "群体"
+      ],
+      "intensity": 4,
+      "text": "一旦开始追求围观效果，群体标签就会被写得越来越抓马。复杂的处境不见了，剩下的全是更适合起哄的整类人段子。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0000",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "group-spokesperson",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "吧里每次聊这种事，最先刷起来的永远是那句最像标题的话，不是最完整的解释。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0006",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "group-spokesperson",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [],
+      "intensity": 3,
+      "text": "这种楼一热起来，最抓马的群体标签马上满屏飞，真正具体的人和事反倒没了。"
+    },
+    {
+      "id": "group-spokesperson-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "group-spokesperson",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "群体"
+      ],
+      "intensity": 3,
+      "text": "上下文一没，个体差异很快就会被群体刻板印象吞掉。最后留下来的不是那个人发生了什么，而是大家对那一类人的老印象。"
+    },
+    {
+      "id": "moral-judge-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "边界"
+      ],
+      "intensity": 4,
+      "text": "你先把人分成两拨，后面就只剩互相审判了。判断一件事，不是看谁站队站得快。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0001",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "moral-judge",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立"
+      ],
+      "intensity": 3,
+      "text": "你先把人按阵营摆好，后面整楼就只剩互相扣帽子，谁还管原帖到底在问什么。"
+    },
+    {
+      "id": "moral-judge-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "边界"
+      ],
+      "intensity": 4,
+      "text": "别一看到情绪高就默认谁更真诚。嗓门大只能证明他急了，证明不了他讲得对。"
+    },
+    {
+      "id": "moral-judge-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "育儿",
+        "责任"
+      ],
+      "intensity": 3,
+      "text": "你要是真觉得孩子重要，就别把牺牲说得像别人欠你的。孩子不是挡箭牌，自己的不甘心也别全塞给家庭。"
+    },
+    {
+      "id": "moral-judge-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "加班",
+        "边界"
+      ],
+      "intensity": 3,
+      "text": "别把抱怨压力先扣成矫情。一个月拿七千、晚上十一点还在改第三版的人，先谈人还能不能喘气，再谈态度好不好看。"
+    },
+    {
+      "id": "moral-judge-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "讨论",
+        "表达"
+      ],
+      "intensity": 3,
+      "text": "你要是每次开口都先把立场话说满，后面再补细节基本没人信。先把自己放进安全区，再谈问题，本身就是在拿姿态替代内容。"
+    },
+    {
+      "id": "moral-judge-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "边界"
+      ],
+      "intensity": 4,
+      "text": "一句话越像判词越容易被叫好，可真要把事情说清，靠的从来不是这点戏剧感。"
+    },
+    {
+      "id": "moral-judge-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "moral-judge",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "边界"
+      ],
+      "intensity": 3,
+      "text": "背景一拿掉，最先冒出来的就是那些特别像结论的狠话。可没有前提的结论，很多时候只是偷懒。"
+    },
+    {
+      "id": "trend-carrier-conflict-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "amplify-conflict",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "对立",
+        "传播"
+      ],
+      "intensity": 4,
+      "text": "一有站队味，后面的人连想都不用想，直接跟着喊“你们这类人”就行了，这种句式最好复制。"
+    },
+    {
+      "id": "trend-carrier-emotion-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "amplify-emotion",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "情绪",
+        "传播"
+      ],
+      "intensity": 4,
+      "text": "这种时候最容易扩开的就是那种一秒能让人上头的话。谁把情绪打包得最顺手，谁的句子就会满楼飞。"
+    },
+    {
+      "id": "reference-zhihu-kol-import-0007",
+      "sourceId": "reference-zhihu-kol",
+      "personaId": "trend-carrier",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭"
+      ],
+      "intensity": 2,
+      "text": "很多旁观者很喜欢把这类问题说成价值选择题，但对当事人来说，真正压过来的是具体的时间、体力和没人接手的家务，而不是一句口号。"
+    },
+    {
+      "id": "trend-carrier-family-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "评论区",
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "这类讨论下面最容易刷屏的就是“孩子又没逼你生”和“父母本来就该牺牲”这两句。谁把话说得越短越狠，越容易变成整串楼里都在复读的口号。"
+    },
+    {
+      "id": "trend-carrier-overtime-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "overtime-morality"
+      ],
+      "topicTags": [
+        "工作",
+        "传播",
+        "站队"
+      ],
+      "intensity": 3,
+      "text": "这种题里最容易爆的就是“年轻人太脆了”和“老板先别装奋斗”两边互甩。谁先甩出一句能挂标题的话，后面整楼都跟着那个句式跑。"
+    },
+    {
+      "id": "trend-carrier-stance-baseline-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "baseline",
+      "featuredTopicIds": [
+        "stance-preamble"
+      ],
+      "topicTags": [
+        "立场",
+        "传播",
+        "句式"
+      ],
+      "intensity": 3,
+      "text": "这种话题里最容易留下来的不是后半段分析，是前面那串立场护身符。只要有人先把那几句格式化出来，后面的人就会整齐照抄。"
+    },
+    {
+      "id": "reference-baidu-tieba-sunxiaochuan-import-0010",
+      "sourceId": "reference-baidu-tieba-sunxiaochuan",
+      "personaId": "trend-carrier",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "这种帖子下面最容易被复读的就是‘孩子又没逼你生’这种现成口号，越短越好搬。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0000",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "trend-carrier",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [
+        "family-sacrifice"
+      ],
+      "topicTags": [
+        "家庭",
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "这种题里最容易刷屏的就是\"孩子又没逼你生\"这种话，谁说得越短越狠，越容易满楼复读。"
+    },
+    {
+      "id": "reference-robert-llm-data-import-0004",
+      "sourceId": "reference-robert-llm-data",
+      "personaId": "trend-carrier",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "一有热搜味，最容易留下来的永远是那句最像标题的话，不是最完整的解释。"
+    },
+    {
+      "id": "trend-carrier-spectacle-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "reward-spectacle",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "表演",
+        "传播"
+      ],
+      "intensity": 4,
+      "text": "越像高潮台词的话越容易被截出去单发。大家一爱看热闹，正常说话的那批就自动没镜头了。"
+    },
+    {
+      "id": "trend-carrier-context-generic-1",
+      "sourceId": "local-curated-seed-2026-03-29",
+      "personaId": "trend-carrier",
+      "dominantAction": "suppress-context",
+      "featuredTopicIds": [],
+      "topicTags": [
+        "背景",
+        "传播"
+      ],
+      "intensity": 3,
+      "text": "背景越少，句子越轻，越轻越好搬。到最后留下来的不一定最对，只是最适合被复制。"
+    }
+  ]
+}

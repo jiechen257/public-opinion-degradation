@@ -40,6 +40,18 @@ describe("实验引擎", () => {
     expect(firstComment).toMatch(/[你我他她这不就本来就是凭什么谁]/);
   });
 
+  it("默认圆桌会优先命中角色语料库里的具体样本", () => {
+    const session = createExperimentSession({
+      featuredTopicId: "family-sacrifice",
+      topic: "该不该为了孩子牺牲个人发展？",
+      personaIds: defaultPersonaIds,
+    });
+
+    const firstComment = session.rounds[0]?.comments[0]?.text ?? "";
+
+    expect(firstComment).toContain("你要是真觉得孩子重要");
+  });
+
   it("每次平台动作都会推进一轮，并在第 6 次后生成结案记录", () => {
     let session = createExperimentSession({
       featuredTopicId: defaultFeaturedTopicId,
